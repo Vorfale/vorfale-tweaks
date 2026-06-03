@@ -1,13 +1,8 @@
 {
-  "id": "quick-insert-mac-keybind",
-  "title": "Quick Insert Mac Keybind",
+  "id": "linklame-macos-keybind",
+  "title": "Linklame MacOS Keybind",
   "category": "Compatibility",
   "order": 65,
-  "requires": {
-    "modules": [
-      "quick-insert"
-    ]
-  },
   "esmodule": "scripts/main.js",
   "languages": [
     "languages/en.json",

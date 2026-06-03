@@ -1,0 +1,5 @@
+{
+  "VORFALE_TWEAKS.linklame-macos-keybind.name": "Linklame MacOS Keybind",
+  "VORFALE_TWEAKS.linklame-macos-keybind.hint": "Меняет конфликтующие macOS-сочетания Quick Insert и Shadowrun Prompt Success Test на каждом macOS-клиенте.",
+  "VORFALE_TWEAKS.linklame-macos-keybind.description": "Применяет macOS-only переназначения и не трогает Windows, Linux или пользовательские сочетания, выставленные вручную."
+}
