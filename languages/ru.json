@@ -20,5 +20,7 @@
   "VORFALE_TWEAKS.random-ambient-sounds.name": "Random Ambient Sounds",
   "VORFALE_TWEAKS.random-ambient-sounds.hint": "Позволяет звукам сцены случайно проигрывать файлы из папки или wildcard-пути.",
   "VORFALE_TWEAKS.actor-token-setup.name": "Actor Token Setup",
-  "VORFALE_TWEAKS.actor-token-setup.hint": "Добавляет быструю настройку портрета, изображения токена, hover-изображения и имени токена."
+  "VORFALE_TWEAKS.actor-token-setup.hint": "Добавляет быструю настройку портрета, изображения токена, hover-изображения и имени токена.",
+  "VORFALE_TWEAKS.plain-chat-input.name": "Plain Chat Input",
+  "VORFALE_TWEAKS.plain-chat-input.hint": "Отключает автоматическое markdown-форматирование в поле ввода чата."
 }

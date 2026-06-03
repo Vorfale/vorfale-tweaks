@@ -1,0 +1,10 @@
+{
+  "id": "plain-chat-input",
+  "title": "Plain Chat Input",
+  "order": 95,
+  "esmodule": "scripts/main.js",
+  "languages": [
+    "languages/en.json",
+    "languages/ru.json"
+  ]
+}

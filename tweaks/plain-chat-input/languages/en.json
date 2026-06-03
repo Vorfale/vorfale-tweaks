@@ -1,0 +1,5 @@
+{
+  "VORFALE_TWEAKS.plain-chat-input.name": "Plain Chat Input",
+  "VORFALE_TWEAKS.plain-chat-input.hint": "Disable automatic markdown-style formatting shortcuts in the chat input.",
+  "VORFALE_TWEAKS.plain-chat-input.description": "Keeps Foundry's v14 chat editor but disables chat input rules such as dash-to-list, numbered lists, headings, blockquotes, code blocks, horizontal rules, and double-dash replacement."
+}

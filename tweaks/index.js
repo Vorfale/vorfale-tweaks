@@ -6,5 +6,6 @@ export const TWEAK_MANIFESTS = [
   "tweaks/chat-auto-scroll-fix/tweak.json",
   "tweaks/sr5-aa-bridge/tweak.json",
   "tweaks/random-ambient-sounds/tweak.json",
-  "tweaks/actor-token-setup/tweak.json"
+  "tweaks/actor-token-setup/tweak.json",
+  "tweaks/plain-chat-input/tweak.json"
 ];

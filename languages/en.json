@@ -20,5 +20,7 @@
   "VORFALE_TWEAKS.random-ambient-sounds.name": "Random Ambient Sounds",
   "VORFALE_TWEAKS.random-ambient-sounds.hint": "Lets ambient sounds play random files from a folder or wildcard path.",
   "VORFALE_TWEAKS.actor-token-setup.name": "Actor Token Setup",
-  "VORFALE_TWEAKS.actor-token-setup.hint": "Adds quick actor portrait, token image, hover image, and token name setup."
+  "VORFALE_TWEAKS.actor-token-setup.hint": "Adds quick actor portrait, token image, hover image, and token name setup.",
+  "VORFALE_TWEAKS.plain-chat-input.name": "Plain Chat Input",
+  "VORFALE_TWEAKS.plain-chat-input.hint": "Disables automatic markdown-style formatting shortcuts in the chat input."
 }

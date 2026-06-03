@@ -1,0 +1,5 @@
+{
+  "VORFALE_TWEAKS.plain-chat-input.name": "Plain Chat Input",
+  "VORFALE_TWEAKS.plain-chat-input.hint": "Отключает автоматическое markdown-форматирование в поле ввода чата.",
+  "VORFALE_TWEAKS.plain-chat-input.description": "Оставляет чатовый редактор Foundry v14, но выключает автоправила ввода: тире в список, нумерованные списки, заголовки, цитаты, блоки кода, горизонтальные линии и замену двойного тире."
+}
