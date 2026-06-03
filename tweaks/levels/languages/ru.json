@@ -1,0 +1,7 @@
+{
+  "VORFALE_TWEAKS.levels.name": "Levels",
+  "VORFALE_TWEAKS.levels.hint": "Добавить настройки скрытия токенов для уровней.",
+  "VORFALE_TWEAKS.levels.description": "Добавляет чекбокс \"Скрывать токены под полом\" в настройки уровня и скрывает нижние токены под непрозрачными пикселями background.",
+  "VORFALE_TWEAKS.levels.HideTokensUnderFloor": "Скрывать токены под полом",
+  "VORFALE_TWEAKS.levels.HideTokensUnderFloorHint": "Использует задний фон уровня как маску пола. Токены ниже уровня скрываются под непрозрачными пикселями и остаются видимыми через прозрачность по стандартной видимости Foundry."
+}

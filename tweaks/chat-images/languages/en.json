@@ -1,0 +1,11 @@
+{
+  "VORFALE_TWEAKS.chat-images.name": "Chat Images",
+  "VORFALE_TWEAKS.chat-images.hint": "Allow image, video, and audio posting in chat.",
+  "VORFALE_TWEAKS.chat-images.description": "Adds a chat-controls button, drag-and-drop uploads, paste uploads, and cimage/cvideo/caudio commands.",
+  "VORFALE_TWEAKS.chat-images.OpenPicker": "Post media",
+  "VORFALE_TWEAKS.chat-images.Uploading": "Uploading media...",
+  "VORFALE_TWEAKS.chat-images.UploadFailed": "Media upload failed.",
+  "VORFALE_TWEAKS.chat-images.UnsupportedFile": "Only image, video, and audio files can be posted to chat.",
+  "VORFALE_TWEAKS.chat-images.NoUploadPermission": "You need the Upload New Files permission to upload media.",
+  "VORFALE_TWEAKS.chat-images.NoFileSelected": "No file was selected."
+}

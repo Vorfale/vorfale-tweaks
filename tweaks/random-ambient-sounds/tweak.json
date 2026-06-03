@@ -1,0 +1,13 @@
+{
+  "id": "random-ambient-sounds",
+  "title": "Random Ambient Sounds",
+  "order": 80,
+  "esmodule": "scripts/main.js",
+  "styles": [
+    "styles/random-ambient-sounds.css"
+  ],
+  "languages": [
+    "languages/en.json",
+    "languages/ru.json"
+  ]
+}

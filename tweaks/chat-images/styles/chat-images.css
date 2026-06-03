@@ -1,0 +1,120 @@
+.chat-media-v14-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-right: auto;
+}
+
+.chat-media-v14-button {
+  width: 1.75rem;
+  height: 1.75rem;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--color-text-light-6, inherit);
+  cursor: pointer;
+}
+
+.chat-media-v14-button:hover,
+.chat-media-v14-button:focus-visible {
+  background: rgb(255 255 255 / 12%);
+  color: var(--color-text-light-highlight, #fff);
+}
+
+#chat.chat-media-v14-dragging .chat-controls {
+  outline: 2px dashed var(--color-border-highlight, #f0c674);
+  outline-offset: -3px;
+}
+
+#chat.chat-media-v14-busy .chat-media-v14-button {
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+#chat.chat-media-v14-busy .chat-media-v14-button i {
+  animation: chat-media-v14-spin 1s linear infinite;
+}
+
+.chat-media-v14-message {
+  margin: 0.35rem 0 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+  filter: none;
+}
+
+.chat-media-v14-message img,
+.chat-media-v14-message video {
+  display: block;
+  max-width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+  filter: none;
+}
+
+.chat-media-v14-message audio {
+  display: block;
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+  filter: none;
+}
+
+.chat-media-v14-message a {
+  display: inline-block;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+  filter: none;
+}
+
+.chat-message .message-content .chat-media-v14-message,
+.chat-message .message-content .chat-media-v14-message *,
+.ProseMirror .chat-media-v14-message,
+.ProseMirror .chat-media-v14-message * {
+  text-shadow: none;
+  box-shadow: none;
+}
+
+.chat-message .message-content .chat-media-v14-message img,
+.chat-message .message-content .chat-media-v14-message video,
+.chat-message .message-content .chat-media-v14-message audio,
+.ProseMirror .chat-media-v14-message img,
+.ProseMirror .chat-media-v14-message video,
+.ProseMirror .chat-media-v14-message audio {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+  filter: none;
+}
+
+.vorfale-chat-image-popout-open {
+  flex: 0 0 auto;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+@keyframes chat-media-v14-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

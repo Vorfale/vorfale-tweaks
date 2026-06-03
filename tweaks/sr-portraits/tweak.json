@@ -1,0 +1,13 @@
+{
+  "id": "sr-portraits",
+  "title": "SR Portraits",
+  "order": 10,
+  "esmodule": "scripts/main.js",
+  "styles": [
+    "styles/sr-portraits.css"
+  ],
+  "languages": [
+    "languages/en.json",
+    "languages/ru.json"
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "VORFALE_TWEAKS.sr5-aa-bridge.name": "SR5 Automated Animations Bridge",
+  "VORFALE_TWEAKS.sr5-aa-bridge.hint": "Triggers Automated Animations from Shadowrun 5 rolls and preserves AA automatic recognition settings.",
+  "VORFALE_TWEAKS.sr5-aa-bridge.description": "Bridges Shadowrun 5 roll messages to AutomatedAnimations.playAnimation and protects autoanimations/aaAutorec from being lost between Foundry reloads."
+}

@@ -1,0 +1,43 @@
+.chat-message.sr5-chat-portraits .message-header {
+  align-items: center;
+  column-gap: 0.5rem;
+}
+
+.chat-message.sr5-chat-portraits .message-sender {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.chat-message.sr5-chat-portraits .sr5-chat-portrait-link {
+  width: var(--sr5-chat-portrait-size, 40px);
+  height: var(--sr5-chat-portrait-size, 40px);
+  flex: 0 0 var(--sr5-chat-portrait-size, 40px);
+  display: block;
+  overflow: hidden;
+  background: transparent;
+  box-shadow: none;
+  color: inherit;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.chat-message.sr5-chat-portraits .sr5-chat-portrait {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+  border: 0;
+  box-shadow: none;
+  filter: none;
+  image-rendering: auto;
+  mix-blend-mode: normal;
+  opacity: 1;
+  transform: none;
+}
+
+.chat-message.sr5-chat-portraits[data-sr5-chat-portrait-shape="rounded"] .sr5-chat-portrait-link,
+.chat-message.sr5-chat-portraits[data-sr5-chat-portrait-shape="rounded"] .sr5-chat-portrait {
+  border-radius: 4px;
+}

@@ -1,0 +1,10 @@
+{
+  "id": "round-token-borders",
+  "title": "Round Token Borders",
+  "order": 40,
+  "esmodule": "scripts/main.js",
+  "languages": [
+    "languages/en.json",
+    "languages/ru.json"
+  ]
+}

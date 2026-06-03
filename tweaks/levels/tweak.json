@@ -1,0 +1,14 @@
+{
+  "id": "levels",
+  "title": "Levels",
+  "order": 30,
+  "requiresSceneReload": true,
+  "esmodule": "scripts/main.js",
+  "styles": [
+    "styles/levels.css"
+  ],
+  "languages": [
+    "languages/en.json",
+    "languages/ru.json"
+  ]
+}

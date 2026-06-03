@@ -1,0 +1,10 @@
+{
+  "id": "sr5-aa-bridge",
+  "title": "SR5 Automated Animations Bridge",
+  "order": 60,
+  "esmodule": "scripts/main.js",
+  "languages": [
+    "languages/en.json",
+    "languages/ru.json"
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "VORFALE_TWEAKS.levels.name": "Levels",
+  "VORFALE_TWEAKS.levels.hint": "Add level background token hiding controls.",
+  "VORFALE_TWEAKS.levels.description": "Adds the Hide tokens under floor checkbox to Level settings and hides lower tokens under opaque level background pixels.",
+  "VORFALE_TWEAKS.levels.HideTokensUnderFloor": "Скрывать токены под полом",
+  "VORFALE_TWEAKS.levels.HideTokensUnderFloorHint": "Uses this level's background image as the floor mask. Tokens below the level are hidden under opaque pixels and can be seen through transparent pixels using Foundry's standard visibility."
+}

@@ -1,0 +1,10 @@
+{
+  "VORFALE_TWEAKS.ReloadSceneTitle": "Перезагрузить сцену?",
+  "VORFALE_TWEAKS.ReloadSceneContent": "Этот твик меняет отображение сцены. Перезагрузить Foundry сейчас?",
+  "VORFALE_TWEAKS.sr-portraits.name": "SR Portraits",
+  "VORFALE_TWEAKS.sr-portraits.description": "Показывает портрет говорящего токена в чате.",
+  "VORFALE_TWEAKS.chat-images.name": "Chat Images",
+  "VORFALE_TWEAKS.chat-images.description": "Добавляет отправку медиа в чат.",
+  "VORFALE_TWEAKS.levels.name": "Levels",
+  "VORFALE_TWEAKS.levels.description": "Добавляет скрытие токенов под background уровня."
+}

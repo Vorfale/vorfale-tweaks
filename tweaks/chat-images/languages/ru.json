@@ -1,0 +1,11 @@
+{
+  "VORFALE_TWEAKS.chat-images.name": "Chat Images",
+  "VORFALE_TWEAKS.chat-images.hint": "Разрешить отправку изображений, видео и аудио в чат.",
+  "VORFALE_TWEAKS.chat-images.description": "Добавляет кнопку в chat-controls, drag-and-drop, вставку из буфера и команды cimage/cvideo/caudio.",
+  "VORFALE_TWEAKS.chat-images.OpenPicker": "Отправить медиа",
+  "VORFALE_TWEAKS.chat-images.Uploading": "Загрузка медиа...",
+  "VORFALE_TWEAKS.chat-images.UploadFailed": "Не удалось загрузить медиа.",
+  "VORFALE_TWEAKS.chat-images.UnsupportedFile": "В чат можно отправлять только изображения, видео и аудио.",
+  "VORFALE_TWEAKS.chat-images.NoUploadPermission": "Нужно право Upload New Files для загрузки медиа.",
+  "VORFALE_TWEAKS.chat-images.NoFileSelected": "Файл не выбран."
+}

@@ -1,0 +1,15 @@
+# OS/editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local development output
+*.log
+*.tmp
+*.zip
+node_modules/
+
+# Foundry/local build artifacts
+dist/
+build/
+coverage/

@@ -1,0 +1,5 @@
+{
+  "VORFALE_TWEAKS.sr-portraits.name": "SR Portraits",
+  "VORFALE_TWEAKS.sr-portraits.hint": "Показывать портрет токена рядом с именем говорящего в чате.",
+  "VORFALE_TWEAKS.sr-portraits.description": "Показывает портрет говорящего токена в чате и открывает лист персонажа по клику на портрет."
+}

@@ -1,0 +1,5 @@
+{
+  "VORFALE_TWEAKS.sr-portraits.name": "SR Portraits",
+  "VORFALE_TWEAKS.sr-portraits.hint": "Show token portraits next to chat speaker names.",
+  "VORFALE_TWEAKS.sr-portraits.description": "Shows the speaking token portrait in chat and opens the actor sheet when the portrait is clicked."
+}

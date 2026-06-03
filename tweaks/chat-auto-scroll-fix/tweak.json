@@ -1,0 +1,10 @@
+{
+  "id": "chat-auto-scroll-fix",
+  "title": "Chat Auto Scroll Fix",
+  "order": 50,
+  "esmodule": "scripts/main.js",
+  "languages": [
+    "languages/en.json",
+    "languages/ru.json"
+  ]
+}

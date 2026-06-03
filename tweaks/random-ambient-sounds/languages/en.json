@@ -1,0 +1,13 @@
+{
+  "VORFALE_TWEAKS.random-ambient-sounds.name": "Random Ambient Sounds",
+  "VORFALE_TWEAKS.random-ambient-sounds.hint": "Let ambient sounds play random files from a folder or wildcard path at random intervals.",
+  "VORFALE_TWEAKS.random-ambient-sounds.description": "Adds random wildcard playback controls to Ambient Sound configuration sheets.",
+  "VORFALE_TWEAKS.random-ambient-sounds.Enable": "Randomize wildcard sound",
+  "VORFALE_TWEAKS.random-ambient-sounds.EnableHint": "Use the source path as a folder or wildcard such as sounds/rain/* and play random positional one-shots instead of the configured loop.",
+  "VORFALE_TWEAKS.random-ambient-sounds.Path": "Folder or wildcard path",
+  "VORFALE_TWEAKS.random-ambient-sounds.PathHint": "Examples: sounds/rain/*, sounds/rain/*.ogg, or sounds/rain. The regular source file remains a valid fallback.",
+  "VORFALE_TWEAKS.random-ambient-sounds.Interval": "Random interval",
+  "VORFALE_TWEAKS.random-ambient-sounds.Seconds": "seconds",
+  "VORFALE_TWEAKS.random-ambient-sounds.Browse": "Browse",
+  "VORFALE_TWEAKS.random-ambient-sounds.NoFiles": "No audio files found for random ambient sound."
+}

@@ -1,0 +1,5 @@
+{
+  "VORFALE_TWEAKS.round-token-borders.name": "Round Token Borders",
+  "VORFALE_TWEAKS.round-token-borders.hint": "Draw token hover and control borders as round rings instead of square frames.",
+  "VORFALE_TWEAKS.round-token-borders.description": "Replaces Foundry token border frames with circular or elliptical rings."
+}

@@ -1,0 +1,10 @@
+{
+  "VORFALE_TWEAKS.ReloadSceneTitle": "Reload scene?",
+  "VORFALE_TWEAKS.ReloadSceneContent": "This tweak changes scene rendering. Reload Foundry now?",
+  "VORFALE_TWEAKS.sr-portraits.name": "SR Portraits",
+  "VORFALE_TWEAKS.sr-portraits.description": "Shows the speaking token portrait in chat.",
+  "VORFALE_TWEAKS.chat-images.name": "Chat Images",
+  "VORFALE_TWEAKS.chat-images.description": "Adds chat media posting.",
+  "VORFALE_TWEAKS.levels.name": "Levels",
+  "VORFALE_TWEAKS.levels.description": "Adds level background token hiding."
+}

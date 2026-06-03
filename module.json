@@ -1,0 +1,35 @@
+{
+  "id": "vorfale-tweaks",
+  "title": "Vorfale Tweaks",
+  "version": "1.0.53",
+  "authors": [
+    {
+      "name": "Vorfale"
+    },
+    {
+      "name": "Codex"
+    }
+  ],
+  "compatibility": {
+    "minimum": "14",
+    "verified": "14.363"
+  },
+  "esmodules": [
+    "scripts/main.js"
+  ],
+  "styles": [
+    "styles/vorfale-tweaks.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "languages/en.json"
+    },
+    {
+      "lang": "ru",
+      "name": "Русский",
+      "path": "languages/ru.json"
+    }
+  ]
+}

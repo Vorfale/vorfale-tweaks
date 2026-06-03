@@ -1,0 +1,19 @@
+.vorfale-random-ambient-sounds-options .form-fields {
+  display: grid;
+  grid-template-columns: minmax(5rem, 1fr) auto minmax(5rem, 1fr) auto;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.vorfale-random-ambient-sounds-options .vorfale-random-ambient-sounds-path-fields {
+  grid-template-columns: minmax(0, 1fr) 2rem;
+}
+
+.vorfale-random-ambient-sounds-options .vorfale-random-ambient-sounds-path-fields input[type="text"] {
+  width: 100%;
+}
+
+.vorfale-random-ambient-sounds-options .vorfale-random-ambient-sounds-browse {
+  min-width: 2rem;
+  height: 2rem;
+}

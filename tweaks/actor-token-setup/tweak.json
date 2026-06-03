@@ -1,0 +1,13 @@
+{
+  "id": "actor-token-setup",
+  "title": "Actor Token Setup",
+  "order": 90,
+  "esmodule": "scripts/main.js",
+  "styles": [
+    "styles/actor-token-setup.css"
+  ],
+  "languages": [
+    "languages/en.json",
+    "languages/ru.json"
+  ]
+}
