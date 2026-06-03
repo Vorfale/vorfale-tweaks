@@ -78,8 +78,11 @@ function idToAction(id) {
 }
 
 function isMacClient() {
-  const platform = navigator.userAgentData?.platform ?? navigator.platform ?? navigator.appVersion ?? "";
-  return /Mac|iPhone|iPad|iPod/i.test(platform);
+  const platform = navigator.userAgentData?.platform ?? navigator.platform ?? "";
+  const userAgent = navigator.userAgent ?? navigator.appVersion ?? "";
+  const isAppleTouchDevice = navigator.maxTouchPoints > 1 && /Mac/i.test(platform);
+
+  return /Mac/i.test(platform) && !isAppleTouchDevice && !/iPhone|iPad|iPod/i.test(userAgent);
 }
 
 function debug(message, data) {
