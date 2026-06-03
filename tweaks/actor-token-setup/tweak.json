@@ -1,6 +1,7 @@
 {
   "id": "actor-token-setup",
   "title": "Actor Token Setup",
+  "category": "UX/UI",
   "order": 90,
   "esmodule": "scripts/main.js",
   "styles": [

@@ -26,6 +26,28 @@
   white-space: nowrap;
 }
 
+.vorfale-tweaks-settings-categories {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.vorfale-tweaks-settings-category {
+  margin: 0;
+  padding: 0.75rem 0.85rem 0.4rem;
+  border: 1px solid var(--color-border-light-tertiary, rgb(255 255 255 / 14%));
+  border-radius: 4px;
+}
+
+.vorfale-tweaks-settings-category > legend {
+  padding: 0 0.35rem;
+  font-size: var(--font-size-14);
+  font-weight: 700;
+}
+
+.vorfale-tweaks-settings-category > .form-group:last-child {
+  margin-bottom: 0;
+}
+
 .form-group.vorfale-tweaks-setting-unavailable {
   opacity: 0.55;
 }

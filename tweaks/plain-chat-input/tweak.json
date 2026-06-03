@@ -1,6 +1,7 @@
 {
   "id": "plain-chat-input",
   "title": "Plain Chat Input",
+  "category": "Chat",
   "order": 95,
   "esmodule": "scripts/main.js",
   "languages": [

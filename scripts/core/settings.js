@@ -3,6 +3,16 @@ import { getTweakAvailability, getTweaks, TWEAK_IDS } from "./registry.js";
 
 export { MODULE_ID };
 
+const CATEGORY_ORDER = [
+  "Chat",
+  "Compatibility",
+  "Trinkets",
+  "Sound",
+  "UX/UI",
+  "Foundry V14 fixes",
+  "Other"
+];
+
 export function registerVorfaleSettings() {
   game.settings.register(MODULE_ID, "aaAutorecBackup", {
     name: "AA Autorec Backup",
@@ -30,7 +40,9 @@ export function registerVorfaleSettings() {
   }
 
   Hooks.on("renderSettingsConfig", (_app, html) => {
-    markUnavailableTweakSettings(normalizeHtml(html));
+    const element = normalizeHtml(html);
+    groupTweakSettingsByCategory(element);
+    markUnavailableTweakSettings(element);
   });
 }
 
@@ -63,6 +75,53 @@ function canManageTweaks() {
   return game.user?.isGM === true;
 }
 
+function groupTweakSettingsByCategory(element) {
+  if (!element) return;
+
+  const tweakEntries = getTweaks().map(tweak => ({
+    tweak,
+    group: findTweakSettingGroup(element, tweak.id)
+  })).filter(entry => entry.group);
+
+  if (!tweakEntries.length) return;
+
+  const firstGroup = tweakEntries[0].group;
+  const parent = firstGroup.parentElement;
+  if (!parent || parent.querySelector(".vorfale-tweaks-settings-categories")) return;
+
+  const wrapper = document.createElement("section");
+  wrapper.className = "vorfale-tweaks-settings-categories";
+
+  const byCategory = new Map();
+  for (const entry of tweakEntries) {
+    const category = entry.tweak.category || "Other";
+    if (!byCategory.has(category)) byCategory.set(category, []);
+    byCategory.get(category).push(entry);
+  }
+
+  for (const category of orderedCategories(byCategory)) {
+    const section = document.createElement("fieldset");
+    section.className = "vorfale-tweaks-settings-category";
+
+    const legend = document.createElement("legend");
+    legend.textContent = category;
+    section.append(legend);
+
+    for (const { group } of byCategory.get(category)) section.append(group);
+    wrapper.append(section);
+  }
+
+  parent.insertBefore(wrapper, firstGroup);
+}
+
+function orderedCategories(byCategory) {
+  const known = CATEGORY_ORDER.filter(category => byCategory.has(category));
+  const unknown = Array.from(byCategory.keys())
+    .filter(category => !CATEGORY_ORDER.includes(category))
+    .sort((a, b) => a.localeCompare(b));
+  return [...known, ...unknown];
+}
+
 function markUnavailableTweakSettings(element) {
   if (!element) return;
 
@@ -70,7 +129,7 @@ function markUnavailableTweakSettings(element) {
     const availability = getTweakAvailability(key);
     if (availability.available) continue;
 
-    const input = element.querySelector(`[name="${MODULE_ID}.${key}"]`);
+    const input = getTweakSettingInput(element, key);
     if (!input) continue;
 
     input.disabled = true;
@@ -97,6 +156,14 @@ function formatMissingDependencies(missing) {
     return `${label}: ${id}`;
   });
   return game.i18n.format("VORFALE_TWEAKS.MissingDependencies", { dependencies: items.join(", ") });
+}
+
+function findTweakSettingGroup(element, key) {
+  return getTweakSettingInput(element, key)?.closest(".form-group") ?? null;
+}
+
+function getTweakSettingInput(element, key) {
+  return element.querySelector(`[name="${MODULE_ID}.${key}"]`);
 }
 
 function capitalize(value) {

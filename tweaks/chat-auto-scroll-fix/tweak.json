@@ -1,6 +1,7 @@
 {
   "id": "chat-auto-scroll-fix",
   "title": "Chat Auto Scroll Fix",
+  "category": "Chat",
   "order": 50,
   "esmodule": "scripts/main.js",
   "languages": [

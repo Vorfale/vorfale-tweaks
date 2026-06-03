@@ -1,6 +1,7 @@
 {
   "id": "levels",
   "title": "Levels",
+  "category": "Foundry V14 fixes",
   "order": 30,
   "requiresSceneReload": true,
   "esmodule": "scripts/main.js",

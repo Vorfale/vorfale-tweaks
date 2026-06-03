@@ -1,6 +1,7 @@
 {
   "id": "random-ambient-sounds",
   "title": "Random Ambient Sounds",
+  "category": "Sound",
   "order": 80,
   "esmodule": "scripts/main.js",
   "styles": [

@@ -1,6 +1,7 @@
 {
   "id": "round-token-borders",
   "title": "Round Token Borders",
+  "category": "Trinkets",
   "order": 40,
   "esmodule": "scripts/main.js",
   "languages": [

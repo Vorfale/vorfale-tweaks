@@ -1,6 +1,7 @@
 {
   "id": "sr5-aa-bridge",
   "title": "SR5 Automated Animations Bridge",
+  "category": "Compatibility",
   "order": 60,
   "requires": {
     "systems": [

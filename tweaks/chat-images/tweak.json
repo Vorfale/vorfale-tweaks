@@ -1,6 +1,7 @@
 {
   "id": "chat-images",
   "title": "Chat Images",
+  "category": "Chat",
   "order": 20,
   "esmodule": "scripts/main.js",
   "styles": [
