@@ -1,6 +1,7 @@
 {
   "id": "sr-portraits",
   "title": "SR Portraits",
+  "category": "Chat",
   "order": 10,
   "requires": {
     "systems": [
