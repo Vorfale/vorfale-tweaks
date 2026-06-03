@@ -85,13 +85,6 @@ function groupTweakSettingsByCategory(element) {
 
   if (!tweakEntries.length) return;
 
-  const firstGroup = tweakEntries[0].group;
-  const parent = firstGroup.parentElement;
-  if (!parent || parent.querySelector(".vorfale-tweaks-settings-categories")) return;
-
-  const wrapper = document.createElement("section");
-  wrapper.className = "vorfale-tweaks-settings-categories";
-
   const byCategory = new Map();
   for (const entry of tweakEntries) {
     const category = entry.tweak.category || "Other";
@@ -100,18 +93,17 @@ function groupTweakSettingsByCategory(element) {
   }
 
   for (const category of orderedCategories(byCategory)) {
-    const section = document.createElement("fieldset");
-    section.className = "vorfale-tweaks-settings-category";
+    const firstGroup = byCategory.get(category)[0]?.group;
+    const parent = firstGroup?.parentElement;
+    if (!parent) continue;
+    if (firstGroup.previousElementSibling?.dataset?.vorfaleTweaksCategory === category) continue;
 
-    const legend = document.createElement("legend");
-    legend.textContent = category;
-    section.append(legend);
-
-    for (const { group } of byCategory.get(category)) section.append(group);
-    wrapper.append(section);
+    const header = document.createElement("h3");
+    header.className = "vorfale-tweaks-settings-category";
+    header.dataset.vorfaleTweaksCategory = category;
+    header.textContent = category;
+    parent.insertBefore(header, firstGroup);
   }
-
-  parent.insertBefore(wrapper, firstGroup);
 }
 
 function orderedCategories(byCategory) {
