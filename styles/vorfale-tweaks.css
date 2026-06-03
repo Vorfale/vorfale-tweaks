@@ -25,3 +25,17 @@
   gap: 0.35rem;
   white-space: nowrap;
 }
+
+.form-group.vorfale-tweaks-setting-unavailable {
+  opacity: 0.55;
+}
+
+.form-group.vorfale-tweaks-setting-unavailable input {
+  cursor: not-allowed;
+}
+
+.vorfale-tweaks-missing-dependencies {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--color-text-light-6, #a8a8a8);
+}

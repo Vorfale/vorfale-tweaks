@@ -2,6 +2,11 @@
   "id": "sr-portraits",
   "title": "SR Portraits",
   "order": 10,
+  "requires": {
+    "systems": [
+      "shadowrun5e"
+    ]
+  },
   "esmodule": "scripts/main.js",
   "styles": [
     "styles/sr-portraits.css"

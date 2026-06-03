@@ -2,6 +2,14 @@
   "id": "sr5-aa-bridge",
   "title": "SR5 Automated Animations Bridge",
   "order": 60,
+  "requires": {
+    "systems": [
+      "shadowrun5e"
+    ],
+    "modules": [
+      "autoanimations"
+    ]
+  },
   "esmodule": "scripts/main.js",
   "languages": [
     "languages/en.json",

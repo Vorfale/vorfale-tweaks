@@ -33,6 +33,29 @@ export function getTweak(id) {
   return registry.get(id) ?? null;
 }
 
+export function isTweakAvailable(id) {
+  return getTweakAvailability(id).available;
+}
+
+export function getTweakAvailability(id) {
+  const manifest = getTweak(id);
+  if (!manifest) return { available: true, missing: [] };
+
+  const missing = [];
+  for (const systemId of manifest.requires?.systems ?? []) {
+    if (game.system?.id !== systemId) missing.push(`system:${systemId}`);
+  }
+
+  for (const moduleId of manifest.requires?.modules ?? []) {
+    if (game.modules?.get?.(moduleId)?.active !== true) missing.push(`module:${moduleId}`);
+  }
+
+  return {
+    available: missing.length === 0,
+    missing
+  };
+}
+
 async function loadTweakManifest(path) {
   const response = await fetch(`modules/${MODULE_ID}/${path}`);
   if (!response.ok) throw new Error(`Could not load tweak manifest: ${path}`);
@@ -77,9 +100,10 @@ function createTweakContext(manifest) {
     moduleId: MODULE_ID,
     manifest,
     localize: key => game.i18n.localize(`VORFALE_TWEAKS.${manifest.id}.${key}`),
-    isEnabled: () => game.settings.get(MODULE_ID, manifest.id) === true,
+    isAvailable: () => isTweakAvailable(manifest.id),
+    isEnabled: () => game.settings.get(MODULE_ID, manifest.id) === true && isTweakAvailable(manifest.id),
     onChange: callback => Hooks.on("vorfaleTweaks.changed", changedId => {
-      if (changedId === manifest.id) callback(game.settings.get(MODULE_ID, manifest.id) === true);
+      if (changedId === manifest.id) callback(game.settings.get(MODULE_ID, manifest.id) === true && isTweakAvailable(manifest.id));
     })
   };
 }

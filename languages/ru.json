@@ -1,10 +1,24 @@
 {
   "VORFALE_TWEAKS.ReloadSceneTitle": "Перезагрузить сцену?",
   "VORFALE_TWEAKS.ReloadSceneContent": "Этот твик меняет отображение сцены. Перезагрузить Foundry сейчас?",
+  "VORFALE_TWEAKS.DependencyUnavailable": "Этот твик выключен, потому что нужная система или модуль не активны.",
+  "VORFALE_TWEAKS.DependencySystem": "система",
+  "VORFALE_TWEAKS.DependencyModule": "модуль",
+  "VORFALE_TWEAKS.MissingDependencies": "Не хватает: {dependencies}.",
   "VORFALE_TWEAKS.sr-portraits.name": "SR Portraits",
-  "VORFALE_TWEAKS.sr-portraits.description": "Показывает портрет говорящего токена в чате.",
+  "VORFALE_TWEAKS.sr-portraits.hint": "Показывает портрет говорящего токена в чате и открывает лист актера по клику на портрет.",
   "VORFALE_TWEAKS.chat-images.name": "Chat Images",
-  "VORFALE_TWEAKS.chat-images.description": "Добавляет отправку медиа в чат.",
+  "VORFALE_TWEAKS.chat-images.hint": "Добавляет отправку медиа в чат, загрузку файлов, вставку и предпросмотр.",
   "VORFALE_TWEAKS.levels.name": "Levels",
-  "VORFALE_TWEAKS.levels.description": "Добавляет скрытие токенов под background уровня."
+  "VORFALE_TWEAKS.levels.hint": "Добавляет настройки скрытия токенов под непрозрачными пикселями пола уровня.",
+  "VORFALE_TWEAKS.round-token-borders.name": "Round Token Borders",
+  "VORFALE_TWEAKS.round-token-borders.hint": "Меняет квадратную рамку наведения и выделения токена на круглую.",
+  "VORFALE_TWEAKS.chat-auto-scroll-fix.name": "Chat Auto Scroll Fix",
+  "VORFALE_TWEAKS.chat-auto-scroll-fix.hint": "Прокручивает чат к новым сообщениям, когда чат уже был внизу.",
+  "VORFALE_TWEAKS.sr5-aa-bridge.name": "SR5 Automated Animations Bridge",
+  "VORFALE_TWEAKS.sr5-aa-bridge.hint": "Запускает Automated Animations из бросков Shadowrun 5 и сохраняет настройки auto recognition AA.",
+  "VORFALE_TWEAKS.random-ambient-sounds.name": "Random Ambient Sounds",
+  "VORFALE_TWEAKS.random-ambient-sounds.hint": "Позволяет звукам сцены случайно проигрывать файлы из папки или wildcard-пути.",
+  "VORFALE_TWEAKS.actor-token-setup.name": "Actor Token Setup",
+  "VORFALE_TWEAKS.actor-token-setup.hint": "Добавляет быструю настройку портрета, изображения токена, hover-изображения и имени токена."
 }
