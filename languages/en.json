@@ -17,6 +17,8 @@
   "VORFALE_TWEAKS.chat-auto-scroll-fix.hint": "Keeps chat pinned to the newest message when appropriate.",
   "VORFALE_TWEAKS.sr5-aa-bridge.name": "SR5 Automated Animations Bridge",
   "VORFALE_TWEAKS.sr5-aa-bridge.hint": "Triggers Automated Animations from Shadowrun 5 rolls and preserves AA automatic recognition settings.",
+  "VORFALE_TWEAKS.quick-insert-mac-keybind.name": "Quick Insert Mac Keybind",
+  "VORFALE_TWEAKS.quick-insert-mac-keybind.hint": "Changes Quick Insert from Ctrl/Command + Space to Command + AltRight on macOS clients.",
   "VORFALE_TWEAKS.random-ambient-sounds.name": "Random Ambient Sounds",
   "VORFALE_TWEAKS.random-ambient-sounds.hint": "Lets ambient sounds play random files from a folder or wildcard path.",
   "VORFALE_TWEAKS.actor-token-setup.name": "Actor Token Setup",

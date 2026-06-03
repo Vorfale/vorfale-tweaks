@@ -1,0 +1,5 @@
+{
+  "VORFALE_TWEAKS.quick-insert-mac-keybind.name": "Quick Insert Mac Keybind",
+  "VORFALE_TWEAKS.quick-insert-mac-keybind.hint": "Меняет Quick Insert с Ctrl/Command + Space на Command + AltRight только на macOS-клиентах.",
+  "VORFALE_TWEAKS.quick-insert-mac-keybind.description": "Применяет macOS-only переназначение Quick Insert и не трогает Windows, Linux или пользовательские сочетания, выставленные вручную."
+}

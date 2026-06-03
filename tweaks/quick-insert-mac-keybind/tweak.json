@@ -1,0 +1,16 @@
+{
+  "id": "quick-insert-mac-keybind",
+  "title": "Quick Insert Mac Keybind",
+  "category": "Compatibility",
+  "order": 65,
+  "requires": {
+    "modules": [
+      "quick-insert"
+    ]
+  },
+  "esmodule": "scripts/main.js",
+  "languages": [
+    "languages/en.json",
+    "languages/ru.json"
+  ]
+}
