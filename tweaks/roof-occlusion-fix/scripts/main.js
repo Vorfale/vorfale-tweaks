@@ -43,6 +43,11 @@ function patchTokenNameplates() {
 
   const originalRefreshState = TokenClass.prototype._refreshState;
   const originalRefreshVisibility = TokenClass.prototype._refreshVisibility;
+  const originalCanHover = TokenClass.prototype._canHover;
+  const originalCanControl = TokenClass.prototype._canControl;
+  const originalCanHUD = TokenClass.prototype._canHUD;
+  const originalCanView = TokenClass.prototype._canView;
+  const originalCanDrag = TokenClass.prototype._canDrag;
   if (typeof originalRefreshState !== "function") return;
 
   TokenClass.prototype._refreshState = function vorfaleRoofOcclusionRefreshState(...args) {
@@ -57,7 +62,45 @@ function patchTokenNameplates() {
     };
   }
 
-  TokenClass.prototype[TOKEN_PATCH_KEY] = { originalRefreshState, originalRefreshVisibility };
+  if (typeof originalCanHover === "function") {
+    TokenClass.prototype._canHover = function vorfaleRoofOcclusionCanHover(user, event) {
+      return originalCanHover.call(this, user, event) && !isTokenBlockedByClosedFadeRoof(this);
+    };
+  }
+
+  if (typeof originalCanControl === "function") {
+    TokenClass.prototype._canControl = function vorfaleRoofOcclusionCanControl(user, event) {
+      return originalCanControl.call(this, user, event) && !isTokenBlockedByClosedFadeRoof(this);
+    };
+  }
+
+  if (typeof originalCanHUD === "function") {
+    TokenClass.prototype._canHUD = function vorfaleRoofOcclusionCanHUD(user, event) {
+      return originalCanHUD.call(this, user, event) && !isTokenBlockedByClosedFadeRoof(this);
+    };
+  }
+
+  if (typeof originalCanView === "function") {
+    TokenClass.prototype._canView = function vorfaleRoofOcclusionCanView(user, event) {
+      return originalCanView.call(this, user, event) && !isTokenBlockedByClosedFadeRoof(this);
+    };
+  }
+
+  if (typeof originalCanDrag === "function") {
+    TokenClass.prototype._canDrag = function vorfaleRoofOcclusionCanDrag(user, event) {
+      return originalCanDrag.call(this, user, event) && !isTokenBlockedByClosedFadeRoof(this);
+    };
+  }
+
+  TokenClass.prototype[TOKEN_PATCH_KEY] = {
+    originalRefreshState,
+    originalRefreshVisibility,
+    originalCanHover,
+    originalCanControl,
+    originalCanHUD,
+    originalCanView,
+    originalCanDrag
+  };
 }
 
 function shouldLimitFadeOcclusion(mesh) {
@@ -75,9 +118,7 @@ function canTokenFadeRoof(token) {
   if (token.vision?.active) return true;
 
   const controlled = canvas.tokens?.controlled ?? [];
-  if (controlled.length) return controlled.includes(token);
-
-  return token === canvas.tokens?.hover;
+  return controlled.length ? controlled.includes(token) : false;
 }
 
 function shouldHideTokenNameplateUnderRoof(token) {
@@ -90,7 +131,17 @@ function shouldHideTokenNameplateUnderRoof(token) {
 function applyRoofNameplateVisibility(token) {
   // Never force-show names. Foundry decides whether the nameplate may be visible;
   // this tweak can only additionally hide it while a closed fade roof covers the token.
-  if (context?.isEnabled?.() && shouldHideTokenNameplateUnderRoof(token)) token.nameplate.visible = false;
+  if (!context?.isEnabled?.() || !shouldHideTokenNameplateUnderRoof(token)) return;
+  token.nameplate.visible = false;
+  if (token.tooltip) token.tooltip.visible = false;
+  if (token.levelIndicator) token.levelIndicator.visible = false;
+  clearRoofBlockedHover(token);
+}
+
+function isTokenBlockedByClosedFadeRoof(token) {
+  if (!context?.isEnabled?.()) return false;
+  if (!token?.visible || canTokenFadeRoof(token)) return false;
+  return isTokenUnderClosedFadeRoof(token);
 }
 
 function isTokenUnderClosedFadeRoof(token) {
@@ -144,6 +195,7 @@ function installNameplateHoverRefresh() {
 }
 
 function scheduleNameplateRefresh() {
+  if (!context?.isEnabled?.()) return;
   if (nameplateRefreshFrame !== null) return;
   nameplateRefreshFrame = window.requestAnimationFrame(() => {
     nameplateRefreshFrame = null;
@@ -158,4 +210,9 @@ function refreshTokenNameplates() {
 
 function isTile(object) {
   return object?.document?.documentName === "Tile";
+}
+
+function clearRoofBlockedHover(token) {
+  if (!token?.hover || !isTokenBlockedByClosedFadeRoof(token)) return;
+  token._onHoverOut?.(new Event("pointerout"));
 }
