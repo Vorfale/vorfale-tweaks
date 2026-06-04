@@ -1,9 +1,9 @@
 const PATCH_KEY = Symbol.for("vorfaleTweaks.roofOcclusionFix.patch");
 const TOKEN_PATCH_KEY = Symbol.for("vorfaleTweaks.roofOcclusionFix.tokenPatch");
-const NAMEPLATE_REFRESH_DELAY = 75;
+const NAMEPLATE_REFRESH_DELAY = 32;
+const NAMEPLATE_MASK_KEY = Symbol.for("vorfaleTweaks.roofOcclusionFix.nameplateMask");
 
 let context;
-let originalTestOcclusion = null;
 let nameplateRefreshTimer = null;
 
 export function init(tweakContext) {
@@ -28,7 +28,6 @@ function patchPrimarySpriteMesh() {
 
   const original = MeshClass.prototype.testOcclusion;
   if (typeof original !== "function") return;
-  originalTestOcclusion = original;
 
   MeshClass.prototype.testOcclusion = function vorfaleRoofOcclusionTest(token) {
     if (context?.isEnabled?.() && shouldLimitFadeOcclusion(this) && !canTokenFadeRoof(token)) return false;
@@ -42,15 +41,23 @@ function patchTokenNameplates() {
   const TokenClass = foundry.canvas?.placeables?.Token;
   if (!TokenClass?.prototype || TokenClass.prototype[TOKEN_PATCH_KEY]) return;
 
-  const original = TokenClass.prototype._refreshState;
-  if (typeof original !== "function") return;
+  const originalRefreshState = TokenClass.prototype._refreshState;
+  const originalRefreshPosition = TokenClass.prototype._refreshPosition;
+  if (typeof originalRefreshState !== "function") return;
 
   TokenClass.prototype._refreshState = function vorfaleRoofOcclusionRefreshState(...args) {
-    original.apply(this, args);
-    if (context?.isEnabled?.() && shouldHideTokenNameplateUnderRoof(this)) this.nameplate.visible = false;
+    originalRefreshState.apply(this, args);
+    updateNameplateRoofMask(this);
   };
 
-  TokenClass.prototype[TOKEN_PATCH_KEY] = { original };
+  if (typeof originalRefreshPosition === "function") {
+    TokenClass.prototype._refreshPosition = function vorfaleRoofOcclusionRefreshPosition(...args) {
+      originalRefreshPosition.apply(this, args);
+      updateNameplateRoofMask(this);
+    };
+  }
+
+  TokenClass.prototype[TOKEN_PATCH_KEY] = { originalRefreshState, originalRefreshPosition };
 }
 
 function shouldLimitFadeOcclusion(mesh) {
@@ -73,25 +80,36 @@ function canTokenFadeRoof(token) {
   return token === canvas.tokens?.hover;
 }
 
-function shouldHideTokenNameplateUnderRoof(token) {
-  if (!token?.nameplate?.visible) return false;
-  if (canTokenFadeRoof(token)) return false;
-  return isTokenUnderClosedFadeRoof(token);
-}
+function updateNameplateRoofMask(token) {
+  if (!token?.nameplate) return;
 
-function isTokenUnderClosedFadeRoof(token) {
-  let underFadeRoof = false;
-  const candidates = canvas.primary?.quadtree?.getObjects?.(token.bounds) ?? [];
-
-  for (const pco of candidates) {
-    if (!shouldLimitFadeOcclusion(pco)) continue;
-    if (!testRoofOcclusion(pco, token)) continue;
-
-    underFadeRoof = true;
-    if (isRoofCurrentlyRevealed(pco)) return false;
+  const roofBounds = getClosedFadeRoofBoundsForNameplate(token);
+  if (!context?.isEnabled?.() || !roofBounds.length) {
+    clearNameplateRoofMask(token);
+    return;
   }
 
-  return underFadeRoof;
+  const mask = getNameplateRoofMask(token);
+  drawInverseNameplateMask(token, mask, roofBounds);
+  token.nameplate.mask = mask;
+}
+
+function getClosedFadeRoofBoundsForNameplate(token) {
+  if (canTokenFadeRoof(token)) return [];
+
+  const nameBounds = getNameplateCanvasBounds(token);
+  if (!nameBounds) return [];
+
+  const candidates = canvas.primary?.quadtree?.getObjects?.(nameBounds) ?? [];
+  const roofBounds = [];
+  for (const pco of candidates) {
+    if (!shouldLimitFadeOcclusion(pco)) continue;
+    if (isRoofCurrentlyRevealed(pco)) return [];
+    if (!pco.canvasBounds?.intersects?.(nameBounds)) continue;
+    roofBounds.push(pco.canvasBounds);
+  }
+
+  return roofBounds;
 }
 
 function isRoofCurrentlyRevealed(mesh) {
@@ -102,16 +120,6 @@ function isRoofCurrentlyRevealed(mesh) {
     || Number(state.radial ?? 0) > 0
     || Number(state.vision ?? 0) > 0
     || Number(hoverState.occlusion ?? 0) > 0;
-}
-
-function testRoofOcclusion(mesh, token) {
-  const original = originalTestOcclusion ?? mesh?.[PATCH_KEY]?.original;
-  if (typeof original !== "function") return false;
-  try {
-    return original.call(mesh, token) === true;
-  } catch (_error) {
-    return false;
-  }
 }
 
 function refreshOcclusion() {
@@ -135,10 +143,67 @@ function scheduleNameplateRefresh() {
 }
 
 function refreshTokenNameplates() {
-  if (!canvas?.ready || !context?.isEnabled?.()) return;
-  for (const token of canvas.tokens?.placeables ?? []) token._refreshState?.();
+  if (!canvas?.ready) return;
+  for (const token of canvas.tokens?.placeables ?? []) updateNameplateRoofMask(token);
 }
 
 function isTile(object) {
   return object?.document?.documentName === "Tile";
+}
+
+function getNameplateCanvasBounds(token) {
+  if (!token?.nameplate?.visible) return null;
+  try {
+    return token.nameplate.getBounds();
+  } catch (_error) {
+    return null;
+  }
+}
+
+function getNameplateRoofMask(token) {
+  if (token[NAMEPLATE_MASK_KEY]?.destroyed === false) return token[NAMEPLATE_MASK_KEY];
+
+  const mask = new PIXI.LegacyGraphics();
+  mask.name = "vorfale-roof-nameplate-mask";
+  token[NAMEPLATE_MASK_KEY] = mask;
+  token.addChild(mask);
+  return mask;
+}
+
+function clearNameplateRoofMask(token) {
+  const mask = token?.[NAMEPLATE_MASK_KEY];
+  if (token?.nameplate?.mask === mask) token.nameplate.mask = null;
+  mask?.clear?.();
+}
+
+function drawInverseNameplateMask(token, mask, roofBounds) {
+  mask.clear();
+  mask.beginFill(0xFFFFFF, 1);
+  mask.drawRect(-100000, -100000, 200000, 200000);
+
+  for (const bounds of roofBounds) {
+    const points = rectangleBoundsToLocalPolygon(token, bounds);
+    if (!points.length) continue;
+    mask.beginHole();
+    mask.drawPolygon(points);
+    mask.endHole();
+  }
+
+  mask.endFill();
+}
+
+function rectangleBoundsToLocalPolygon(token, bounds) {
+  const corners = [
+    [bounds.left, bounds.top],
+    [bounds.right, bounds.top],
+    [bounds.right, bounds.bottom],
+    [bounds.left, bounds.bottom]
+  ];
+
+  const points = [];
+  for (const [x, y] of corners) {
+    const point = token.worldTransform.applyInverse(new PIXI.Point(x, y));
+    points.push(point.x, point.y);
+  }
+  return points;
 }
