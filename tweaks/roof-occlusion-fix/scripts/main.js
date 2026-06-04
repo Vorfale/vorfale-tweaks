@@ -42,18 +42,23 @@ function patchTokenNameplates() {
   const TokenClass = foundry.canvas?.placeables?.Token;
   if (!TokenClass?.prototype || TokenClass.prototype[TOKEN_PATCH_KEY]) return;
 
-  const original = TokenClass.prototype._refreshState;
-  if (typeof original !== "function") return;
+  const originalRefreshState = TokenClass.prototype._refreshState;
+  const originalRefreshVisibility = TokenClass.prototype._refreshVisibility;
+  if (typeof originalRefreshState !== "function") return;
 
   TokenClass.prototype._refreshState = function vorfaleRoofOcclusionRefreshState(...args) {
-    original.apply(this, args);
-
-    // Never force-show names. Foundry decides whether the nameplate may be visible;
-    // this tweak can only additionally hide it while a closed fade roof covers the token.
-    if (context?.isEnabled?.() && shouldHideTokenNameplateUnderRoof(this)) this.nameplate.visible = false;
+    originalRefreshState.apply(this, args);
+    applyRoofNameplateVisibility(this);
   };
 
-  TokenClass.prototype[TOKEN_PATCH_KEY] = { original };
+  if (typeof originalRefreshVisibility === "function") {
+    TokenClass.prototype._refreshVisibility = function vorfaleRoofOcclusionRefreshVisibility(...args) {
+      originalRefreshVisibility.apply(this, args);
+      this._refreshState?.();
+    };
+  }
+
+  TokenClass.prototype[TOKEN_PATCH_KEY] = { originalRefreshState, originalRefreshVisibility };
 }
 
 function shouldLimitFadeOcclusion(mesh) {
@@ -78,8 +83,15 @@ function canTokenFadeRoof(token) {
 
 function shouldHideTokenNameplateUnderRoof(token) {
   if (!token?.nameplate?.visible) return false;
+  if (!token.visible) return false;
   if (canTokenFadeRoof(token)) return false;
   return isTokenUnderClosedFadeRoof(token);
+}
+
+function applyRoofNameplateVisibility(token) {
+  // Never force-show names. Foundry decides whether the nameplate may be visible;
+  // this tweak can only additionally hide it while a closed fade roof covers the token.
+  if (context?.isEnabled?.() && shouldHideTokenNameplateUnderRoof(token)) token.nameplate.visible = false;
 }
 
 function isTokenUnderClosedFadeRoof(token) {
