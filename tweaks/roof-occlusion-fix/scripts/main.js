@@ -44,10 +44,10 @@ function patchTokenNameplates() {
   const originalRefreshState = TokenClass.prototype._refreshState;
   const originalRefreshVisibility = TokenClass.prototype._refreshVisibility;
   const originalCanHover = TokenClass.prototype._canHover;
-  const originalCanControl = TokenClass.prototype._canControl;
   const originalCanHUD = TokenClass.prototype._canHUD;
   const originalCanView = TokenClass.prototype._canView;
   const originalCanDrag = TokenClass.prototype._canDrag;
+  const originalSetTarget = TokenClass.prototype.setTarget;
   if (typeof originalRefreshState !== "function") return;
 
   TokenClass.prototype._refreshState = function vorfaleRoofOcclusionRefreshState(...args) {
@@ -65,12 +65,6 @@ function patchTokenNameplates() {
   if (typeof originalCanHover === "function") {
     TokenClass.prototype._canHover = function vorfaleRoofOcclusionCanHover(user, event) {
       return originalCanHover.call(this, user, event) && !isTokenBlockedByClosedFadeRoof(this);
-    };
-  }
-
-  if (typeof originalCanControl === "function") {
-    TokenClass.prototype._canControl = function vorfaleRoofOcclusionCanControl(user, event) {
-      return originalCanControl.call(this, user, event) && !isTokenBlockedByClosedFadeRoof(this);
     };
   }
 
@@ -92,14 +86,21 @@ function patchTokenNameplates() {
     };
   }
 
+  if (typeof originalSetTarget === "function") {
+    TokenClass.prototype.setTarget = function vorfaleRoofOcclusionSetTarget(targeted = true, ...args) {
+      if (targeted && isTokenBlockedByClosedFadeRoof(this)) return this;
+      return originalSetTarget.call(this, targeted, ...args);
+    };
+  }
+
   TokenClass.prototype[TOKEN_PATCH_KEY] = {
     originalRefreshState,
     originalRefreshVisibility,
     originalCanHover,
-    originalCanControl,
     originalCanHUD,
     originalCanView,
-    originalCanDrag
+    originalCanDrag,
+    originalSetTarget
   };
 }
 
