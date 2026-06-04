@@ -36,7 +36,7 @@ The module is intended for Foundry VTT v14.
   Connects Shadowrun 5 attack roll messages to Automated Animations and protects AA automatic recognition settings from being lost after reloads. Requires Shadowrun 5 and Automated Animations.
 
 - **Linklame MacOS Keybind**  
-  Applies macOS-only keybinding fixes for Quick Insert and Shadowrun Prompt Success Test, while leaving Windows, Linux, and existing custom user bindings untouched.
+  Applies macOS-only keybinding fixes for Quick Insert and Shadowrun Prompt Success Test, while leaving Windows, Linux, and existing custom user bindings untouched. Requires Quick Insert.
 
 ### Trinkets
 
@@ -75,7 +75,7 @@ Most tweaks are system-agnostic. A few are intentionally conditional:
 
 - **SR Portraits** requires the `shadowrun5e` system.
 - **SR5 Automated Animations Bridge** requires the `shadowrun5e` system and the `autoanimations` module.
-- **Linklame MacOS Keybind** only applies changes on macOS clients and only when the relevant keybindings exist.
+- **Linklame MacOS Keybind** requires the `quick-insert` module, only applies changes on macOS clients, and only changes relevant default keybindings.
 
 When a dependency is missing, the tweak appears disabled in the settings menu instead of trying to run.
 

@@ -18,7 +18,7 @@
   "VORFALE_TWEAKS.sr5-aa-bridge.name": "SR5 Automated Animations Bridge",
   "VORFALE_TWEAKS.sr5-aa-bridge.hint": "Запускает Automated Animations из бросков Shadowrun 5 и сохраняет настройки auto recognition AA.",
   "VORFALE_TWEAKS.linklame-macos-keybind.name": "Linklame MacOS Keybind",
-  "VORFALE_TWEAKS.linklame-macos-keybind.hint": "Меняет конфликтующие macOS-сочетания Quick Insert и Shadowrun Prompt Success Test на каждом macOS-клиенте.",
+  "VORFALE_TWEAKS.linklame-macos-keybind.hint": "Меняет конфликтующие macOS-сочетания Quick Insert и Shadowrun Prompt Success Test на каждом macOS-клиенте. ??????? Quick Insert.",
   "VORFALE_TWEAKS.random-ambient-sounds.name": "Random Ambient Sounds",
   "VORFALE_TWEAKS.random-ambient-sounds.hint": "Позволяет звукам сцены случайно проигрывать файлы из папки или wildcard-пути.",
   "VORFALE_TWEAKS.actor-token-setup.name": "Actor Token Setup",

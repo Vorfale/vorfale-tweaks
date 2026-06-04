@@ -3,6 +3,11 @@
   "title": "Linklame MacOS Keybind",
   "category": "Compatibility",
   "order": 65,
+  "requires": {
+    "modules": [
+      "quick-insert"
+    ]
+  },
   "esmodule": "scripts/main.js",
   "languages": [
     "languages/en.json",
