@@ -1,0 +1,11 @@
+{
+  "id": "roof-occlusion-fix",
+  "title": "Roof Occlusion Fix",
+  "category": "Tiles",
+  "order": 105,
+  "esmodule": "scripts/main.js",
+  "languages": [
+    "languages/en.json",
+    "languages/ru.json"
+  ]
+}

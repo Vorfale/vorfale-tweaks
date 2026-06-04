@@ -8,5 +8,6 @@ export const TWEAK_MANIFESTS = [
   "tweaks/round-token-borders/tweak.json",
   "tweaks/random-ambient-sounds/tweak.json",
   "tweaks/actor-token-setup/tweak.json",
+  "tweaks/roof-occlusion-fix/tweak.json",
   "tweaks/levels/tweak.json"
 ];
