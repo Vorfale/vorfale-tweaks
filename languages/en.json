@@ -24,7 +24,7 @@
   "VORFALE_TWEAKS.actor-token-setup.name": "Actor Token Setup",
   "VORFALE_TWEAKS.actor-token-setup.hint": "Adds quick actor portrait, token image, hover image, and token name setup.",
   "VORFALE_TWEAKS.roof-occlusion-fix.name": "Roof Occlusion Fix",
-  "VORFALE_TWEAKS.roof-occlusion-fix.hint": "Prevents Fade roof tiles from being opened by unrelated visible tokens under the roof.",
+  "VORFALE_TWEAKS.roof-occlusion-fix.hint": "Prevents Fade roof tiles and token names under them from being revealed by unrelated visible tokens.",
   "VORFALE_TWEAKS.plain-chat-input.name": "Plain Chat Input",
   "VORFALE_TWEAKS.plain-chat-input.hint": "Disables automatic markdown-style formatting shortcuts in the chat input."
 }

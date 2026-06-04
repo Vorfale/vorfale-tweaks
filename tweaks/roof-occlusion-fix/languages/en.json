@@ -1,3 +1,3 @@
 {
-  "VORFALE_TWEAKS.roof-occlusion-fix.description": "Keeps overhead Fade roofs from disappearing for a viewer just because another visible, unrelated token is standing under the roof."
+  "VORFALE_TWEAKS.roof-occlusion-fix.description": "Keeps overhead Fade roofs and token names under them from being revealed just because another visible, unrelated token is standing under the roof."
 }

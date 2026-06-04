@@ -1,7 +1,7 @@
 {
   "id": "roof-occlusion-fix",
   "title": "Roof Occlusion Fix",
-  "category": "Tiles",
+  "category": "Foundry V14 fixes",
   "order": 105,
   "esmodule": "scripts/main.js",
   "languages": [

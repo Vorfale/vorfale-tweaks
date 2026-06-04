@@ -9,7 +9,6 @@ const CATEGORY_ORDER = [
   "Trinkets",
   "Sound",
   "UX/UI",
-  "Tiles",
   "Foundry V14 fixes",
   "Other"
 ];

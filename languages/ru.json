@@ -24,7 +24,7 @@
   "VORFALE_TWEAKS.actor-token-setup.name": "Actor Token Setup",
   "VORFALE_TWEAKS.actor-token-setup.hint": "Добавляет быструю настройку портрета, изображения токена, hover-изображения и имени токена.",
   "VORFALE_TWEAKS.roof-occlusion-fix.name": "Roof Occlusion Fix",
-  "VORFALE_TWEAKS.roof-occlusion-fix.hint": "Не дает крышам с Fade открываться из-за чужих видимых токенов под крышей.",
+  "VORFALE_TWEAKS.roof-occlusion-fix.hint": "Не дает крышам с Fade и именам токенов под ними раскрываться из-за чужих видимых токенов.",
   "VORFALE_TWEAKS.plain-chat-input.name": "Plain Chat Input",
   "VORFALE_TWEAKS.plain-chat-input.hint": "Отключает автоматическое markdown-форматирование в поле ввода чата."
 }
