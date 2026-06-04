@@ -1,8 +1,10 @@
 const PATCH_KEY = Symbol.for("vorfaleTweaks.roofOcclusionFix.patch");
 const TOKEN_PATCH_KEY = Symbol.for("vorfaleTweaks.roofOcclusionFix.tokenPatch");
+const NAMEPLATE_REFRESH_DELAY = 75;
 
 let context;
 let originalTestOcclusion = null;
+let nameplateRefreshTimer = null;
 
 export function init(tweakContext) {
   context = tweakContext;
@@ -13,6 +15,7 @@ export function init(tweakContext) {
   Hooks.once("ready", patchTokenNameplates);
   Hooks.on("controlToken", refreshOcclusion);
   Hooks.on("updateToken", refreshOcclusion);
+  Hooks.on("canvasReady", installNameplateHoverRefresh);
   context.onChange(refreshOcclusion);
 
   if (game.ready) refreshOcclusion();
@@ -73,16 +76,32 @@ function canTokenFadeRoof(token) {
 function shouldHideTokenNameplateUnderRoof(token) {
   if (!token?.nameplate?.visible) return false;
   if (canTokenFadeRoof(token)) return false;
-  return isTokenUnderLimitedFadeRoof(token);
+  return isTokenUnderClosedFadeRoof(token);
 }
 
-function isTokenUnderLimitedFadeRoof(token) {
+function isTokenUnderClosedFadeRoof(token) {
+  let underFadeRoof = false;
   const candidates = canvas.primary?.quadtree?.getObjects?.(token.bounds) ?? [];
+
   for (const pco of candidates) {
     if (!shouldLimitFadeOcclusion(pco)) continue;
-    if (testRoofOcclusion(pco, token)) return true;
+    if (!testRoofOcclusion(pco, token)) continue;
+
+    underFadeRoof = true;
+    if (isRoofCurrentlyRevealed(pco)) return false;
   }
-  return false;
+
+  return underFadeRoof;
+}
+
+function isRoofCurrentlyRevealed(mesh) {
+  if (mesh.occluded) return true;
+  const state = mesh._occlusionState ?? {};
+  const hoverState = mesh._hoverFadeState ?? {};
+  return Number(state.fade ?? 0) > 0
+    || Number(state.radial ?? 0) > 0
+    || Number(state.vision ?? 0) > 0
+    || Number(hoverState.occlusion ?? 0) > 0;
 }
 
 function testRoofOcclusion(mesh, token) {
@@ -102,11 +121,22 @@ function refreshOcclusion() {
     refreshOcclusionMask: true,
     refreshOccludedSurfaces: true
   });
-  for (const token of canvas.tokens?.placeables ?? []) refreshTokenNameplate(token);
+  scheduleNameplateRefresh();
 }
 
-function refreshTokenNameplate(token) {
-  token?.renderFlags?.set?.({ refreshState: true, refreshNameplate: true });
+function installNameplateHoverRefresh() {
+  document.removeEventListener("mousemove", scheduleNameplateRefresh);
+  document.addEventListener("mousemove", scheduleNameplateRefresh, { passive: true });
+}
+
+function scheduleNameplateRefresh() {
+  window.clearTimeout(nameplateRefreshTimer);
+  nameplateRefreshTimer = window.setTimeout(refreshTokenNameplates, NAMEPLATE_REFRESH_DELAY);
+}
+
+function refreshTokenNameplates() {
+  if (!canvas?.ready || !context?.isEnabled?.()) return;
+  for (const token of canvas.tokens?.placeables ?? []) token._refreshState?.();
 }
 
 function isTile(object) {
