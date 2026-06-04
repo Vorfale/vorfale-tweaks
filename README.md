@@ -1,32 +1,102 @@
 # Vorfale Tweaks
 
-One Foundry VTT module that acts as a container and settings hub for small tweaks.
+Vorfale Tweaks is a modular Foundry VTT v14 add-on that collects small quality-of-life fixes, compatibility bridges, and table-specific workflow improvements in one settings hub.
 
-Each tweak lives in its own folder under `tweaks/`:
+Each feature is built as an independent tweak under `tweaks/`. You can enable or disable every tweak from **Configure Settings > Vorfale Tweaks**, and dependency-specific tweaks are disabled automatically when their required system or module is not active.
 
-- `tweaks/sr-portraits` - chat speaker portraits.
-- `tweaks/chat-images` - chat media upload and rendering.
-- `tweaks/levels` - level background token hiding.
+## Installation
 
-Each tweak folder can contain:
+Use this manifest URL in Foundry's module installer:
 
-- `tweak.json` - metadata and entrypoint.
-- `scripts/main.js` - tweak behavior.
-- `styles/*.css` - tweak-specific styles.
-- `languages/*.json` - tweak-specific localization.
+```text
+https://raw.githubusercontent.com/Vorfale/vorfale-tweaks/main/module.json
+```
 
-## Settings
+The module is intended for Foundry VTT v14.
 
-Open **Configure Settings** and choose **Vorfale Tweaks**.
+## Tweaks
 
-Each section can be enabled or disabled independently:
+### Chat
 
-- **SR Portraits** toggles chat portraits.
-- **Chat Images** toggles the chat-controls media button, drag-and-drop uploads, paste uploads, and media commands.
-- **Levels** toggles the Level settings checkbox and background-token hiding logic.
+- **SR Portraits**  
+  Shows the speaking token portrait next to chat speaker names and opens the actor sheet when the portrait is clicked. Requires the Shadowrun 5 system.
 
-## Notes
+- **Chat Images**  
+  Adds chat media posting for images, video, and audio, including chat controls, uploads, paste support, drag-and-drop support, media previews, and in-Foundry image viewing.
 
-To add a new tweak, add a folder under `tweaks/`, create `tweak.json`, add the manifest path to `tweaks/index.js`, and provide an `init(context)` export from the tweak entrypoint.
+- **Chat Auto Scroll Fix**  
+  Keeps chat pinned to the newest message when appropriate, especially after character speech or fast chat activity.
 
-The level tweak reads old flags from the previous `level-token-cull-v14` module, so existing level checkboxes should keep working after migration.
+- **Plain Chat Input**  
+  Keeps Foundry v14's chat editor but disables automatic markdown-style shortcuts such as dash-to-list, numbered lists, headings, blockquotes, code blocks, horizontal rules, and double-dash replacement.
+
+### Compatibility
+
+- **SR5 Automated Animations Bridge**  
+  Connects Shadowrun 5 attack roll messages to Automated Animations and protects AA automatic recognition settings from being lost after reloads. Requires Shadowrun 5 and Automated Animations.
+
+- **Linklame MacOS Keybind**  
+  Applies macOS-only keybinding fixes for Quick Insert and Shadowrun Prompt Success Test, while leaving Windows, Linux, and existing custom user bindings untouched.
+
+### Trinkets
+
+- **Round Token Borders**  
+  Replaces square hover and control frames with round token rings.
+
+### Sound
+
+- **Random Ambient Sounds**  
+  Extends Ambient Sound configuration with random folder or wildcard playback. Random sounds use Foundry's ambient sound positioning, volume, radius, walls, and audio effects as closely as possible while rotating through matching files.
+
+### UX/UI
+
+- **Actor Token Setup**  
+  Opens a focused setup dialog after actor creation and from actor sheet actions. It edits actor portrait, prototype token image, token name, token display mode, and optional Image Hover specific art.
+
+### Foundry V14 Fixes
+
+- **Levels**  
+  Adds a "Hide tokens under floor" control to Level settings. Lower tokens can be hidden under opaque background pixels while still remaining visible through transparent areas using Foundry's normal visibility rules.
+
+- **Roof Occlusion Fix**  
+  Fixes overhead Fade roof behavior where visible tokens under a roof could incorrectly reveal the entire roof. It also hides token names, elevation labels, hover cues, and targeting through closed roofs until the roof is actually revealed.
+
+## Settings And Storage
+
+The main Vorfale Tweaks switches are stored as Foundry world settings. Tweak-specific document data is stored on the affected Foundry documents, such as actors, tiles, levels, or ambient sounds.
+
+Removing the module does not delete actor images, token prototype settings, ambient sound documents, or other Foundry documents. Features that rely on Vorfale-specific flags simply stop using those flags while the module is disabled or removed.
+
+Some tweaks may ask for a scene or Foundry reload after being enabled or disabled because they patch canvas rendering or document sheet behavior.
+
+## Dependencies
+
+Most tweaks are system-agnostic. A few are intentionally conditional:
+
+- **SR Portraits** requires the `shadowrun5e` system.
+- **SR5 Automated Animations Bridge** requires the `shadowrun5e` system and the `autoanimations` module.
+- **Linklame MacOS Keybind** only applies changes on macOS clients and only when the relevant keybindings exist.
+
+When a dependency is missing, the tweak appears disabled in the settings menu instead of trying to run.
+
+## Development
+
+Each tweak is self-contained:
+
+```text
+tweaks/
+  tweak-id/
+    tweak.json
+    scripts/main.js
+    styles/*.css
+    languages/*.json
+```
+
+To add a new tweak:
+
+1. Create a new folder under `tweaks/`.
+2. Add `tweak.json` with an `id`, `title`, `category`, and optional scripts, styles, languages, dependencies, or reload behavior.
+3. Add the manifest path to `tweaks/index.js`.
+4. Export `init(context)` from the tweak entrypoint.
+
+The settings hub discovers listed tweak manifests and renders them by category. This keeps individual tweaks easy to edit, test, remove, or extend without mixing their logic into the module shell.
