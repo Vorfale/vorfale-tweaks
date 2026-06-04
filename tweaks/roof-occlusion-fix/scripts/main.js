@@ -1,10 +1,9 @@
 const PATCH_KEY = Symbol.for("vorfaleTweaks.roofOcclusionFix.patch");
 const TOKEN_PATCH_KEY = Symbol.for("vorfaleTweaks.roofOcclusionFix.tokenPatch");
-const NAMEPLATE_REFRESH_DELAY = 32;
 
 let context;
 let originalTestOcclusion = null;
-let nameplateRefreshTimer = null;
+let nameplateRefreshFrame = null;
 
 export function init(tweakContext) {
   context = tweakContext;
@@ -145,8 +144,11 @@ function installNameplateHoverRefresh() {
 }
 
 function scheduleNameplateRefresh() {
-  window.clearTimeout(nameplateRefreshTimer);
-  nameplateRefreshTimer = window.setTimeout(refreshTokenNameplates, NAMEPLATE_REFRESH_DELAY);
+  if (nameplateRefreshFrame !== null) return;
+  nameplateRefreshFrame = window.requestAnimationFrame(() => {
+    nameplateRefreshFrame = null;
+    refreshTokenNameplates();
+  });
 }
 
 function refreshTokenNameplates() {
