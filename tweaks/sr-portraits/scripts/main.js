@@ -1,15 +1,20 @@
 const PORTRAIT_SIZE = 40;
 
 let context;
+let refreshTimer = 0;
 
 export function init(tweakContext) {
   context = tweakContext;
 
   Hooks.on("renderChatMessageHTML", (message, html) => addPortraitToMessage(message, html));
   Hooks.on("renderChatMessage", (message, html) => addPortraitToMessage(message, html));
+  Hooks.on("updateActor", scheduleVisiblePortraitRefresh);
+  Hooks.on("updateToken", scheduleVisiblePortraitRefresh);
+  Hooks.on("updateUser", scheduleVisiblePortraitRefresh);
 
   context.onChange(enabled => {
     if (!enabled) removeExistingPortraits();
+    else scheduleVisiblePortraitRefresh();
   });
 }
 
@@ -17,47 +22,65 @@ function addPortraitToMessage(message, html) {
   if (!context.isEnabled()) return;
 
   const element = normalizeElement(html);
-  if (!element || element.dataset.sr5ChatPortraitApplied === "true") return;
+  if (!element) return;
 
   const header = element.querySelector(".message-header");
   const sender = header?.querySelector(".message-sender");
   if (!header || !sender) return;
 
+  updatePortraitElement(message, element, sender);
+}
+
+function updatePortraitElement(message, element, sender = null) {
   const actor = getSpeakerActor(message);
-  const image = getSpeakerImage(message, actor);
-  if (!image) return;
+  const user = getMessageUser(message);
+  const image = getSpeakerImage(message, actor, user);
+  if (!image) {
+    removePortraitFromMessage(element);
+    return;
+  }
 
   element.dataset.sr5ChatPortraitApplied = "true";
   element.classList.add("sr5-chat-portraits");
   element.style.setProperty("--sr5-chat-portrait-size", `${PORTRAIT_SIZE}px`);
   element.dataset.sr5ChatPortraitShape = "rounded";
 
-  const portraitLink = document.createElement("span");
+  const portraitLink = element.querySelector(".sr5-chat-portrait-link") ?? document.createElement("span");
+  const portrait = portraitLink.querySelector(".sr5-chat-portrait") ?? document.createElement("img");
+  const titleName = actor?.name ?? user?.name ?? "";
+
   portraitLink.className = "sr5-chat-portrait-link";
-  portraitLink.role = "button";
+  portraitLink.role = actor ? "button" : "presentation";
   portraitLink.tabIndex = actor ? 0 : -1;
-  portraitLink.title = actor?.name ? `Open ${actor.name}` : "Open speaker";
+  portraitLink.title = actor?.name ? `Open ${actor.name}` : titleName;
+  portraitLink.dataset.actorUuid = actor?.uuid ?? "";
+  portraitLink.dataset.userId = user?.id ?? "";
 
-  const portrait = document.createElement("img");
   portrait.className = "sr5-chat-portrait";
-  portrait.src = image;
-  portrait.alt = actor?.name ? `${actor.name} portrait` : "Speaker portrait";
+  if (portrait.getAttribute("src") !== image) portrait.src = image;
+  portrait.alt = titleName ? `${titleName} portrait` : "Speaker portrait";
   portrait.loading = "lazy";
+  portrait.dataset.currentSrc = image;
 
-  portraitLink.append(portrait);
-  portraitLink.addEventListener("click", event => {
-    event.preventDefault();
-    event.stopPropagation();
-    actor?.sheet?.render(true);
-  });
-  portraitLink.addEventListener("keydown", event => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    event.preventDefault();
-    event.stopPropagation();
-    actor?.sheet?.render(true);
-  });
+  if (!portrait.dataset.sr5PortraitErrorBound) {
+    portrait.dataset.sr5PortraitErrorBound = "true";
+    portrait.addEventListener("error", () => handlePortraitImageError(message, element, portrait));
+  }
 
-  sender.before(portraitLink);
+  if (!portraitLink.dataset.sr5PortraitActionBound) {
+    portraitLink.dataset.sr5PortraitActionBound = "true";
+    portraitLink.addEventListener("click", event => openPortraitActor(event, portraitLink));
+    portraitLink.addEventListener("keydown", event => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      openPortraitActor(event, portraitLink);
+    });
+  }
+
+  if (!portrait.parentElement) portraitLink.append(portrait);
+  if (!portraitLink.parentElement) {
+    const targetSender = sender ?? element.querySelector(".message-header .message-sender");
+    targetSender?.before(portraitLink);
+  }
 }
 
 function normalizeElement(html) {
@@ -81,11 +104,13 @@ function getSpeakerActor(message) {
   }
 }
 
-function getSpeakerImage(message, actor) {
-  const actorImage = cleanImage(actor?.img);
-  const tokenImage = cleanImage(getSpeakerTokenImage(message));
-  const prototypeImage = cleanImage(actor?.prototypeToken?.texture?.src);
-  return tokenImage ?? prototypeImage ?? actorImage ?? null;
+function getSpeakerImage(message, actor, user = getMessageUser(message), excluded = new Set()) {
+  const tokenImage = cleanImage(getSpeakerTokenImage(message), excluded);
+  const prototypeImage = cleanImage(actor?.prototypeToken?.texture?.src, excluded);
+  const actorImage = cleanImage(actor?.img, excluded);
+  const userImage = cleanImage(getUserImage(user), excluded);
+  const userCharacterImage = cleanImage(user?.character?.img, excluded);
+  return tokenImage ?? prototypeImage ?? actorImage ?? userImage ?? userCharacterImage ?? null;
 }
 
 function getSpeakerTokenImage(message) {
@@ -97,17 +122,94 @@ function getSpeakerTokenImage(message) {
   return tokenDocument?.texture?.src ?? tokenDocument?.actor?.img ?? null;
 }
 
-function cleanImage(src) {
+function getMessageUser(message) {
+  if (message.author?.id) return message.author;
+
+  const user = message.user;
+  if (user?.id) return user;
+
+  const userId = typeof user === "string"
+    ? user
+    : message.userId ?? message._source?.user ?? message.data?.user;
+  return userId ? game.users?.get?.(userId) ?? null : null;
+}
+
+function getUserImage(user) {
+  return user?.avatar ?? user?.img ?? user?.image ?? user?.texture?.src ?? null;
+}
+
+function cleanImage(src, excluded = new Set()) {
   if (!src || src === "icons/svg/mystery-man.svg") return null;
+  if (excluded.has(src)) return null;
   return src;
+}
+
+function openPortraitActor(event, portraitLink) {
+  const actor = portraitLink.dataset.actorUuid ? fromUuidSyncSafe(portraitLink.dataset.actorUuid) : null;
+  if (!actor?.sheet) return;
+
+  event.preventDefault();
+  event.stopPropagation();
+  actor.sheet.render(true);
+}
+
+function fromUuidSyncSafe(uuid) {
+  try {
+    return globalThis.fromUuidSync?.(uuid) ?? null;
+  } catch (_error) {
+    return null;
+  }
+}
+
+function handlePortraitImageError(message, element, portrait) {
+  const broken = portrait.dataset.currentSrc || portrait.getAttribute("src");
+  const actor = getSpeakerActor(message);
+  const user = getMessageUser(message);
+  const replacement = getSpeakerImage(message, actor, user, new Set([broken]));
+
+  if (replacement && replacement !== broken) {
+    portrait.dataset.currentSrc = replacement;
+    portrait.src = replacement;
+    return;
+  }
+
+  element.querySelector(".sr5-chat-portrait-link")?.remove();
+  element.classList.remove("sr5-chat-portraits");
+  delete element.dataset.sr5ChatPortraitApplied;
+}
+
+function scheduleVisiblePortraitRefresh() {
+  window.clearTimeout(refreshTimer);
+  refreshTimer = window.setTimeout(refreshVisiblePortraits, 150);
+}
+
+function refreshVisiblePortraits() {
+  if (!context?.isEnabled?.()) return;
+
+  for (const element of document.querySelectorAll(".chat-message")) {
+    const message = getMessageFromElement(element);
+    if (!message) continue;
+    const sender = element.querySelector(".message-header .message-sender");
+    if (!sender) continue;
+    updatePortraitElement(message, element, sender);
+  }
+}
+
+function getMessageFromElement(element) {
+  const id = element.dataset.messageId ?? element.dataset.messageid ?? element.getAttribute("data-message-id");
+  return id ? game.messages?.get?.(id) ?? null : null;
 }
 
 function removeExistingPortraits() {
   for (const message of document.querySelectorAll(".chat-message.sr5-chat-portraits")) {
-    message.querySelector(".sr5-chat-portrait-link")?.remove();
-    message.classList.remove("sr5-chat-portraits");
-    delete message.dataset.sr5ChatPortraitApplied;
-    delete message.dataset.sr5ChatPortraitShape;
-    message.style.removeProperty("--sr5-chat-portrait-size");
+    removePortraitFromMessage(message);
   }
+}
+
+function removePortraitFromMessage(message) {
+  message.querySelector(".sr5-chat-portrait-link")?.remove();
+  message.classList.remove("sr5-chat-portraits");
+  delete message.dataset.sr5ChatPortraitApplied;
+  delete message.dataset.sr5ChatPortraitShape;
+  message.style.removeProperty("--sr5-chat-portrait-size");
 }

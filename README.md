@@ -19,7 +19,7 @@ The module is intended for Foundry VTT v14.
 ### Chat
 
 - **SR Portraits**  
-  Shows the speaking token portrait next to chat speaker names and opens the actor sheet when the portrait is clicked. Requires the Shadowrun 5 system.
+  Shows the speaking token portrait next to chat speaker names and opens the actor sheet when the portrait is clicked. It refreshes visible portraits when token, actor, or user images change, and falls back to the player/GM avatar for messages without a usable actor image. Requires the Shadowrun 5 system.
 
 - **Chat Images**  
   Adds chat media posting for images, video, and audio, including chat controls, uploads, paste support, drag-and-drop support, media previews, and in-Foundry image viewing.

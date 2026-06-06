@@ -21,6 +21,10 @@
   line-height: 0;
 }
 
+.chat-message.sr5-chat-portraits .sr5-chat-portrait-link[role="presentation"] {
+  cursor: default;
+}
+
 .chat-message.sr5-chat-portraits .sr5-chat-portrait {
   width: 100%;
   height: 100%;
