@@ -11,7 +11,6 @@ let currentNarrationId = 0;
 let openTimeout = 0;
 let closeTimeout = 0;
 let scrollTimeout = 0;
-let scrollAnimation = 0;
 
 export function init(tweakContext) {
   context = tweakContext;
@@ -26,6 +25,7 @@ export function init(tweakContext) {
   });
 
   Hooks.on("chatCommandsReady", registerChatCommanderCommands);
+  Hooks.on("deleteChatMessage", onDeleteChatMessage);
   Hooks.on("renderChatMessageHTML", decorateChatMessage);
   Hooks.on("renderChatMessage", (message, html) => decorateChatMessage(message, normalizeElement(html)));
 }
@@ -193,11 +193,13 @@ function renderNarratorState(state = defaultState()) {
     currentNarrationId = narration.id;
     clearNarrationTimers();
     content.style.opacity = "0";
+    content.style.transition = "opacity 0.5s ease-in-out";
     content.style.top = "0px";
 
     openTimeout = window.setTimeout(() => {
       content.innerHTML = narration.message ?? "";
       content.style.opacity = "1";
+      content.style.transition = "opacity 0.5s ease-in-out";
       content.style.top = "0px";
 
       const visibleHeight = Math.min(content.offsetHeight, BOX_MAX_HEIGHT);
@@ -247,17 +249,13 @@ function startNarrationScroll(narration) {
 }
 
 function animateTop(element, from, to, duration) {
-  window.cancelAnimationFrame(scrollAnimation);
-  const startedAt = performance.now();
+  element.style.transition = "opacity 0.5s ease-in-out";
+  element.style.top = `${from}px`;
 
-  const step = now => {
-    const progress = Math.min(1, (now - startedAt) / duration);
-    element.style.top = `${from + ((to - from) * progress)}px`;
-    if (progress < 1) scrollAnimation = window.requestAnimationFrame(step);
-    else scrollAnimation = 0;
-  };
-
-  scrollAnimation = window.requestAnimationFrame(step);
+  requestAnimationFrame(() => {
+    element.style.transition = `opacity 0.5s ease-in-out, top ${duration}ms linear`;
+    element.style.top = `${to}px`;
+  });
 }
 
 async function closeNarration() {
@@ -275,9 +273,7 @@ async function closeNarration() {
 
 function clearNarrationTimers({ keepOpen = false } = {}) {
   window.clearTimeout(scrollTimeout);
-  window.cancelAnimationFrame(scrollAnimation);
   scrollTimeout = 0;
-  scrollAnimation = 0;
 
   if (!keepOpen) {
     window.clearTimeout(openTimeout);
@@ -286,6 +282,18 @@ function clearNarrationTimers({ keepOpen = false } = {}) {
 
   window.clearTimeout(closeTimeout);
   closeTimeout = 0;
+}
+
+function onDeleteChatMessage(message) {
+  if (!context?.isEnabled?.()) return;
+  if (getNarratorType(message) !== TYPE_NARRATION) return;
+
+  const state = getNarratorState();
+  if (!state.narration.display) return;
+
+  const deletedText = getPlainText(message.content).trim();
+  const activeText = String(state.narration.plainText ?? getPlainText(state.narration.message)).trim();
+  if (deletedText && deletedText === activeText) closeNarration();
 }
 
 function updateBackground(root) {
