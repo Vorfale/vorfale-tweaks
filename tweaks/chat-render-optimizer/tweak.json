@@ -1,0 +1,11 @@
+{
+  "id": "chat-render-optimizer",
+  "title": "Chat Render Optimizer",
+  "category": "Foundry V14 fixes",
+  "order": 905,
+  "esmodule": "scripts/main.js",
+  "languages": [
+    "languages/en.json",
+    "languages/ru.json"
+  ]
+}

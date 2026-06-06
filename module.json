@@ -1,10 +1,10 @@
 {
   "id": "vorfale-tweaks",
   "title": "Vorfale Tweaks",
-  "version": "1.0.55",
+  "version": "1.0.56",
   "url": "https://github.com/Vorfale/vorfale-tweaks",
   "manifest": "https://raw.githubusercontent.com/Vorfale/vorfale-tweaks/main/module.json",
-  "download": "https://github.com/Vorfale/vorfale-tweaks/releases/download/v1.0.55/vorfale-tweaks-1.0.55.zip",
+  "download": "https://github.com/Vorfale/vorfale-tweaks/releases/download/v1.0.56/vorfale-tweaks-1.0.56.zip",
   "authors": [
     {
       "name": "Vorfale"
