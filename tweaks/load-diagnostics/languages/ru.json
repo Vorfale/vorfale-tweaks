@@ -14,6 +14,6 @@
   "VORFALE_TWEAKS.load-diagnostics.SectionScene": "Активная сцена",
   "VORFALE_TWEAKS.load-diagnostics.SectionPlayers": "Отчеты игроков",
   "VORFALE_TWEAKS.load-diagnostics.Tooltip": "Открыть аудит загрузки клиента: медленные ассеты, размер сцены, тайминги ресурсов модулей и отчеты игроков.",
-  "VORFALE_TWEAKS.load-diagnostics.SectionChat": "???????? ????",
-  "VORFALE_TWEAKS.load-diagnostics.SectionHeavyChatMessages": "????? ??????? ?????????"
+  "VORFALE_TWEAKS.load-diagnostics.SectionChat": "Загрузка чата",
+  "VORFALE_TWEAKS.load-diagnostics.SectionHeavyChatMessages": "Самые тяжелые сообщения"
 }

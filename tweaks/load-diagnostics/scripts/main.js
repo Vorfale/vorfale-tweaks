@@ -12,6 +12,7 @@ const LARGE_RESOURCE_BYTES = 5 * 1024 * 1024;
 const LARGE_CHAT_MESSAGES = 1500;
 const LARGE_CHAT_HTML_BYTES = 2 * 1024 * 1024;
 const CHAT_MEDIA_WARNING_COUNT = 100;
+const TEXT_ENCODER = new TextEncoder();
 
 let context;
 let run;
@@ -281,9 +282,8 @@ function captureChatSnapshot(source = "manual") {
 
   for (const message of messages) {
     const content = String(message.content ?? "");
-    const text = stripHTML(content);
     const contentBytes = byteLength(content);
-    const textOnlyBytes = byteLength(text);
+    const textOnlyBytes = byteLength(stripTags(content));
     const media = countMedia(content);
     const speaker = message.speaker?.alias || message.alias || message.user?.name || "Unknown";
     const type = message.type ?? message.style ?? "unknown";
@@ -311,11 +311,20 @@ function captureChatSnapshot(source = "manual") {
       htmlBytes: contentBytes,
       textBytes: textOnlyBytes,
       media: media.total,
-      preview: text.trim().slice(0, 140)
+      content
     });
   }
 
   heavyMessages.sort((a, b) => b.htmlBytes - a.htmlBytes);
+  const topHeavyMessages = heavyMessages.slice(0, MAX_CHAT_HEAVY_MESSAGES).map(message => {
+    const preview = stripHTML(message.content).trim().slice(0, 140);
+    delete message.content;
+    return {
+      ...message,
+      preview
+    };
+  });
+
   run.chat = {
     ...existing,
     source,
@@ -333,7 +342,7 @@ function captureChatSnapshot(source = "manual") {
     lastTimestamp,
     byType: topMapEntries(byType, 12),
     topSpeakers: topMapEntries(bySpeaker, 12),
-    heavyMessages: heavyMessages.slice(0, MAX_CHAT_HEAVY_MESSAGES)
+    heavyMessages: topHeavyMessages
   };
 }
 
@@ -857,8 +866,15 @@ function stripHTML(html) {
   return template.content.textContent ?? "";
 }
 
+function stripTags(html) {
+  return String(html ?? "")
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, "")
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "")
+    .replace(/<[^>]+>/g, "");
+}
+
 function byteLength(value) {
-  return new Blob([String(value ?? "")]).size;
+  return TEXT_ENCODER.encode(String(value ?? "")).length;
 }
 
 function topMapEntries(map, limit) {

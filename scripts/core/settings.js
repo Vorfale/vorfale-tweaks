@@ -9,9 +9,12 @@ const CATEGORY_ORDER = [
   "Trinkets",
   "Sound",
   "UX/UI",
+  "Tools",
   "Foundry V14 fixes",
   "Other"
 ];
+
+const DEFAULT_DISABLED_TWEAKS = new Set(["load-diagnostics"]);
 
 export function registerVorfaleSettings() {
   game.settings.register(MODULE_ID, "aaAutorecBackup", {
@@ -29,7 +32,7 @@ export function registerVorfaleSettings() {
       scope: "world",
       config: true,
       type: Boolean,
-      default: true,
+      default: !DEFAULT_DISABLED_TWEAKS.has(key),
       onChange: value => {
         if (!canManageTweaks()) return;
 

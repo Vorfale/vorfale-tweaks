@@ -1,8 +1,9 @@
 {
   "id": "load-diagnostics",
   "title": "Load Diagnostics",
-  "category": "UX/UI",
+  "category": "Tools",
   "order": 145,
+  "defaultEnabled": false,
   "esmodule": "scripts/main.js",
   "styles": [
     "styles/load-diagnostics.css"
