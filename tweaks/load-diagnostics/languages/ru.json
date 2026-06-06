@@ -1,0 +1,17 @@
+{
+  "VORFALE_TWEAKS.load-diagnostics.ReportTitle": "Vorfale: диагностика загрузки",
+  "VORFALE_TWEAKS.load-diagnostics.OpenReport": "Открыть аудит загрузки",
+  "VORFALE_TWEAKS.load-diagnostics.DownloadReport": "Скачать JSON",
+  "VORFALE_TWEAKS.load-diagnostics.CopySummary": "Скопировать сводку",
+  "VORFALE_TWEAKS.load-diagnostics.Close": "Закрыть",
+  "VORFALE_TWEAKS.load-diagnostics.NoData": "Данные диагностики загрузки еще не собраны.",
+  "VORFALE_TWEAKS.load-diagnostics.Copied": "Сводка диагностики загрузки скопирована.",
+  "VORFALE_TWEAKS.load-diagnostics.SectionSummary": "Сводка",
+  "VORFALE_TWEAKS.load-diagnostics.SectionRecommendations": "Рекомендации",
+  "VORFALE_TWEAKS.load-diagnostics.SectionMilestones": "Этапы",
+  "VORFALE_TWEAKS.load-diagnostics.SectionSlowResources": "Медленные ресурсы",
+  "VORFALE_TWEAKS.load-diagnostics.SectionModules": "Ресурсы модулей",
+  "VORFALE_TWEAKS.load-diagnostics.SectionScene": "Активная сцена",
+  "VORFALE_TWEAKS.load-diagnostics.SectionPlayers": "Отчеты игроков",
+  "VORFALE_TWEAKS.load-diagnostics.Tooltip": "Открыть аудит загрузки клиента: медленные ассеты, размер сцены, тайминги ресурсов модулей и отчеты игроков."
+}

@@ -1,0 +1,14 @@
+{
+  "id": "load-diagnostics",
+  "title": "Load Diagnostics",
+  "category": "UX/UI",
+  "order": 145,
+  "esmodule": "scripts/main.js",
+  "styles": [
+    "styles/load-diagnostics.css"
+  ],
+  "languages": [
+    "languages/en.json",
+    "languages/ru.json"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "VORFALE_TWEAKS.load-diagnostics.ReportTitle": "Vorfale Load Diagnostics",
+  "VORFALE_TWEAKS.load-diagnostics.OpenReport": "Open load audit",
+  "VORFALE_TWEAKS.load-diagnostics.DownloadReport": "Download JSON",
+  "VORFALE_TWEAKS.load-diagnostics.CopySummary": "Copy summary",
+  "VORFALE_TWEAKS.load-diagnostics.Close": "Close",
+  "VORFALE_TWEAKS.load-diagnostics.NoData": "No load diagnostics data has been collected yet.",
+  "VORFALE_TWEAKS.load-diagnostics.Copied": "Load diagnostics summary copied.",
+  "VORFALE_TWEAKS.load-diagnostics.SectionSummary": "Summary",
+  "VORFALE_TWEAKS.load-diagnostics.SectionRecommendations": "Recommendations",
+  "VORFALE_TWEAKS.load-diagnostics.SectionMilestones": "Milestones",
+  "VORFALE_TWEAKS.load-diagnostics.SectionSlowResources": "Slow resources",
+  "VORFALE_TWEAKS.load-diagnostics.SectionModules": "Module resources",
+  "VORFALE_TWEAKS.load-diagnostics.SectionScene": "Active scene",
+  "VORFALE_TWEAKS.load-diagnostics.SectionPlayers": "Player reports",
+  "VORFALE_TWEAKS.load-diagnostics.Tooltip": "Open a client load audit with slow assets, scene size, module resource timing, and player reports."
+}

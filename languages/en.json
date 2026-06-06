@@ -28,5 +28,7 @@
   "VORFALE_TWEAKS.plain-chat-input.name": "Plain Chat Input",
   "VORFALE_TWEAKS.plain-chat-input.hint": "Disables automatic markdown-style formatting shortcuts in the chat input.",
   "VORFALE_TWEAKS.narrator.name": "Narrator",
-  "VORFALE_TWEAKS.narrator.hint": "Adds /narrate and /describe chat commands for cinematic narration."
+  "VORFALE_TWEAKS.narrator.hint": "Adds /narrate and /describe chat commands for cinematic narration.",
+  "VORFALE_TWEAKS.load-diagnostics.name": "Load Diagnostics",
+  "VORFALE_TWEAKS.load-diagnostics.hint": "Collects client loading milestones, slow resources, module resource timings, scene weight, errors, and safe optimization recommendations."
 }

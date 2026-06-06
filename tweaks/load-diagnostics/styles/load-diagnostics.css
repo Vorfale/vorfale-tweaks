@@ -1,0 +1,61 @@
+.vorfale-load-diagnostics-dialog .dialog-content {
+  max-height: 72vh;
+  overflow: auto;
+}
+
+.vorfale-load-report {
+  display: grid;
+  gap: 1rem;
+}
+
+.vorfale-load-report section {
+  border-top: 1px solid var(--color-border-light-tertiary, rgb(255 255 255 / 14%));
+  padding-top: 0.75rem;
+}
+
+.vorfale-load-report section:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.vorfale-load-report h3 {
+  margin: 0 0 0.5rem;
+}
+
+.vorfale-load-summary {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.25rem 0.75rem;
+  margin: 0;
+}
+
+.vorfale-load-summary dt {
+  color: var(--color-text-light-6, #a8a8a8);
+  font-weight: 700;
+}
+
+.vorfale-load-summary dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.vorfale-load-report table {
+  width: 100%;
+}
+
+.vorfale-load-report th,
+.vorfale-load-report td {
+  overflow-wrap: anywhere;
+  text-align: left;
+  vertical-align: top;
+}
+
+.vorfale-load-report ol {
+  margin: 0;
+  padding-left: 1.35rem;
+}
+
+.vorfale-load-report li + li {
+  margin-top: 0.35rem;
+}
