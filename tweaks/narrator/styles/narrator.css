@@ -1,0 +1,75 @@
+.vorfale-narrator-chat {
+  border: 0;
+  box-shadow: none;
+}
+
+.vorfale-narrator-chat .message-header,
+.vorfale-narrator-chat .message-metadata,
+.vorfale-narrator-chat .message-sender {
+  display: none;
+}
+
+.vorfale-narrator-chat .message-content {
+  padding: 0.7rem 0.9rem;
+}
+
+.vorfale-narrator-message {
+  color: var(--color-text-primary, #f2f0ea);
+  font-family: Georgia, "Times New Roman", serif;
+  line-height: 1.55;
+  margin: 0;
+  text-align: center;
+  white-space: normal;
+}
+
+.vorfale-narrator-message p {
+  margin: 0.35rem 0;
+}
+
+.vorfale-narrator-description .vorfale-narrator-message {
+  font-size: 1.03rem;
+  font-style: italic;
+  letter-spacing: 0;
+}
+
+.vorfale-narrator-narration .vorfale-narrator-message {
+  font-size: 1.08rem;
+  font-weight: 600;
+}
+
+.vorfale-narrator-overlay {
+  align-items: center;
+  background:
+    radial-gradient(ellipse at center, rgba(12, 10, 8, 0.18), rgba(4, 4, 6, 0.82)),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.68));
+  bottom: 0;
+  color: #f7f1df;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  right: 0;
+  text-align: center;
+  top: 0;
+  transition: opacity 350ms ease;
+  z-index: 100000;
+}
+
+.vorfale-narrator-overlay.vorfale-narrator-overlay-visible {
+  opacity: 1;
+}
+
+.vorfale-narrator-overlay-content {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 4.2vw, 5rem);
+  line-height: 1.22;
+  max-width: min(1100px, 86vw);
+  padding: 2rem;
+  text-shadow: 0 3px 24px rgba(0, 0, 0, 0.95), 0 0 18px rgba(255, 216, 135, 0.18);
+}
+
+.vorfale-narrator-overlay-content p {
+  margin: 0.45em 0;
+}

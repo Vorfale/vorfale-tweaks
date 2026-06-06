@@ -1,0 +1,8 @@
+{
+  "VORFALE_TWEAKS.narrator.name": "Narrator",
+  "VORFALE_TWEAKS.narrator.hint": "Adds /narrate and /describe chat commands for cinematic narration.",
+  "VORFALE_TWEAKS.narrator.description": "Adds v14-safe narration commands inspired by Narrator Tools: /narrate shows text in chat and as a fullscreen overlay, while /describe posts a centered descriptive chat message.",
+  "VORFALE_TWEAKS.narrator.Narrator": "Narrator",
+  "VORFALE_TWEAKS.narrator.EmptyMessage": "Narrator message is empty.",
+  "VORFALE_TWEAKS.narrator.PermissionDenied": "Only a GM or Assistant GM can use narrator commands."
+}

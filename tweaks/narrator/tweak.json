@@ -1,0 +1,14 @@
+{
+  "id": "narrator",
+  "title": "Narrator",
+  "category": "Chat",
+  "order": 75,
+  "esmodule": "scripts/main.js",
+  "styles": [
+    "styles/narrator.css"
+  ],
+  "languages": [
+    "languages/en.json",
+    "languages/ru.json"
+  ]
+}

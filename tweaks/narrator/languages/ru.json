@@ -1,0 +1,8 @@
+{
+  "VORFALE_TWEAKS.narrator.name": "Нарратор",
+  "VORFALE_TWEAKS.narrator.hint": "Добавляет чат-команды /narrate и /describe для кинематографичного повествования.",
+  "VORFALE_TWEAKS.narrator.description": "Добавляет совместимые с v14 команды наррации по мотивам Narrator Tools: /narrate показывает текст в чате и полноэкранным оверлеем, а /describe отправляет центрированное описательное сообщение в чат.",
+  "VORFALE_TWEAKS.narrator.Narrator": "Нарратор",
+  "VORFALE_TWEAKS.narrator.EmptyMessage": "Сообщение нарратора пустое.",
+  "VORFALE_TWEAKS.narrator.PermissionDenied": "Команды нарратора доступны только ведущему или ассистенту ведущего."
+}

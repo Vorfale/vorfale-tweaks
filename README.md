@@ -30,6 +30,9 @@ The module is intended for Foundry VTT v14.
 - **Plain Chat Input**  
   Keeps Foundry v14's chat editor but disables automatic markdown-style shortcuts such as dash-to-list, numbered lists, headings, blockquotes, code blocks, horizontal rules, and double-dash replacement.
 
+- **Narrator**  
+  Adds `/narrate` and `/describe` chat commands. `/narrate` posts a narration message and displays it as a temporary fullscreen overlay, while `/describe` posts a centered descriptive chat message.
+
 ### Compatibility
 
 - **SR5 Automated Animations Bridge**  

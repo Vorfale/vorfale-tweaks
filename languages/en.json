@@ -26,5 +26,7 @@
   "VORFALE_TWEAKS.roof-occlusion-fix.name": "Roof Occlusion Fix",
   "VORFALE_TWEAKS.roof-occlusion-fix.hint": "Keeps Fade roofs closed over unrelated visible tokens and hides their names, elevation labels, and interaction cues until the roof is actually revealed.",
   "VORFALE_TWEAKS.plain-chat-input.name": "Plain Chat Input",
-  "VORFALE_TWEAKS.plain-chat-input.hint": "Disables automatic markdown-style formatting shortcuts in the chat input."
+  "VORFALE_TWEAKS.plain-chat-input.hint": "Disables automatic markdown-style formatting shortcuts in the chat input.",
+  "VORFALE_TWEAKS.narrator.name": "Narrator",
+  "VORFALE_TWEAKS.narrator.hint": "Adds /narrate and /describe chat commands for cinematic narration."
 }
