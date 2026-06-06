@@ -1,13 +1,17 @@
 const ARCHIVE_INDEX_SETTING = "chatArchiveIndex";
+const ARCHIVE_FALLBACK_SETTING = "chatArchiveFallbackStore";
 const ARCHIVE_DIR = "vorfale-chat-archives";
 const MIN_ACTIVE_MESSAGES = 500;
 const ARCHIVE_BATCH_LIMIT = 2000;
 const MAX_ARCHIVE_PREVIEW_MESSAGES = 250;
+const STARTUP_PROMPT_DELAY_MS = 2500;
 
 const state = {
   context: null,
   activeMode: "active",
-  archiveCache: new Map()
+  archiveCache: new Map(),
+  startupPromptShown: false,
+  archiving: false
 };
 
 export function init(tweakContext) {
@@ -16,11 +20,48 @@ export function init(tweakContext) {
 
   Hooks.on("renderChatLog", chatLog => scheduleEnhanceChat(chatLog));
   Hooks.on("renderSidebar", () => scheduleEnhanceChat(ui.chat));
-  Hooks.once("ready", () => scheduleEnhanceChat(ui.chat));
+  Hooks.once("ready", () => {
+    scheduleEnhanceChat(ui.chat);
+    scheduleStartupArchivePrompt();
+  });
 
   tweakContext.onChange(enabled => {
     if (enabled) scheduleEnhanceChat(ui.chat);
     else restoreChatMode();
+  });
+}
+
+function scheduleStartupArchivePrompt() {
+  if (!state.context?.isEnabled?.() || !game.user?.isGM || state.startupPromptShown) return;
+
+  state.startupPromptShown = true;
+  window.setTimeout(() => {
+    if (!state.context?.isEnabled?.() || !game.user?.isGM) return;
+    const candidates = getArchiveCandidates();
+    console.info("vorfale-tweaks/chat-session-archive | Startup scan.", {
+      loadedMessages: getLoadedMessages().length,
+      archiveCandidates: candidates.length,
+      keepActivePublicMessages: MIN_ACTIVE_MESSAGES,
+      batchLimit: ARCHIVE_BATCH_LIMIT
+    });
+    if (!candidates.length) return;
+    showStartupArchiveDialog(candidates.length);
+  }, STARTUP_PROMPT_DELAY_MS);
+}
+
+function showStartupArchiveDialog(count) {
+  Dialog.confirm({
+    title: localize("StartupArchiveTitle"),
+    content: `
+      <p>${game.i18n.format("VORFALE_TWEAKS.chat-render-optimizer.StartupArchiveContent", {
+        count,
+        keep: MIN_ACTIVE_MESSAGES
+      })}</p>
+      <p>${escapeHTML(localize("StartupArchiveHint"))}</p>
+    `,
+    yes: () => archiveOldChat({ skipConfirm: true }),
+    no: () => {},
+    defaultYes: false
   });
 }
 
@@ -31,6 +72,14 @@ function registerArchiveSettings(moduleId) {
     config: false,
     type: Object,
     default: { archives: [] }
+  });
+
+  game.settings.register(moduleId, ARCHIVE_FALLBACK_SETTING, {
+    name: "Chat Archive Fallback Store",
+    scope: "world",
+    config: false,
+    type: Object,
+    default: { archives: {} }
   });
 }
 
@@ -166,8 +215,9 @@ function restoreChatMode() {
   log.classList.remove("vorfale-chat-pane-hidden");
 }
 
-async function archiveOldChat() {
+async function archiveOldChat({ skipConfirm = false } = {}) {
   if (!state.context?.isEnabled?.() || !game.user?.isGM) return;
+  if (state.archiving) return;
 
   const candidates = getArchiveCandidates();
   if (!candidates.length) {
@@ -175,9 +225,10 @@ async function archiveOldChat() {
     return;
   }
 
-  const confirmed = await confirmArchive(candidates.length);
+  const confirmed = skipConfirm ? true : await confirmArchive(candidates.length);
   if (!confirmed) return;
 
+  state.archiving = true;
   try {
     ui.notifications?.info?.(localize("ArchivingStarted"));
     const archive = await writeArchiveFile(candidates);
@@ -191,11 +242,13 @@ async function archiveOldChat() {
   } catch (error) {
     console.error("vorfale-tweaks/chat-render-optimizer | Could not archive chat messages.", error);
     ui.notifications?.error?.(localize("ArchivingFailed"));
+  } finally {
+    state.archiving = false;
   }
 }
 
 function getArchiveCandidates() {
-  const messages = Array.from(game.messages ?? [])
+  const messages = getLoadedMessages()
     .filter(message => message?.id)
     .filter(message => isPublicMessage(message))
     .sort((a, b) => getMessageTimestamp(a) - getMessageTimestamp(b));
@@ -204,6 +257,11 @@ function getArchiveCandidates() {
   return messages
     .slice(0, activeFloor)
     .slice(0, ARCHIVE_BATCH_LIMIT);
+}
+
+function getLoadedMessages() {
+  if (Array.isArray(game.messages?.contents)) return game.messages.contents;
+  return Array.from(game.messages ?? []);
 }
 
 function isPublicMessage(message) {
@@ -243,7 +301,15 @@ async function writeArchiveFile(messages) {
   };
 
   const file = new File([JSON.stringify(archive)], filename, { type: "application/json" });
-  await FilePicker.upload("data", directory, file, { notify: false });
+  try {
+    await FilePicker.upload("data", directory, file, { notify: false });
+  } catch (error) {
+    console.warn("vorfale-tweaks/chat-session-archive | File archive failed, using world setting fallback.", error);
+    await saveFallbackArchive(archive);
+    archive.file = null;
+    archive.storage = "setting";
+  }
+
   return archive;
 }
 
@@ -264,7 +330,8 @@ async function appendArchiveIndex(archive) {
     messageCount: archive.messageCount,
     firstTimestamp: archive.firstTimestamp,
     lastTimestamp: archive.lastTimestamp,
-    file: archive.file
+    file: archive.file,
+    storage: archive.storage ?? "file"
   };
 
   index.archives = [entry, ...index.archives.filter(item => item.id !== entry.id)];
@@ -292,12 +359,27 @@ async function loadArchiveIntoPanel(panel, archiveId) {
 async function loadArchive(archiveMeta) {
   if (state.archiveCache.has(archiveMeta.id)) return state.archiveCache.get(archiveMeta.id);
 
+  if (archiveMeta.storage === "setting") {
+    const fallback = game.settings.get(state.context.moduleId, ARCHIVE_FALLBACK_SETTING);
+    const archive = fallback?.archives?.[archiveMeta.id];
+    if (!archive) throw new Error(`Missing fallback archive: ${archiveMeta.id}`);
+    state.archiveCache.set(archiveMeta.id, archive);
+    return archive;
+  }
+
   const response = await fetch(archiveMeta.file);
   if (!response.ok) throw new Error(`Could not fetch archive: ${archiveMeta.file}`);
 
   const archive = await response.json();
   state.archiveCache.set(archiveMeta.id, archive);
   return archive;
+}
+
+async function saveFallbackArchive(archive) {
+  const fallback = game.settings.get(state.context.moduleId, ARCHIVE_FALLBACK_SETTING);
+  const archives = foundry.utils.deepClone(fallback?.archives ?? {});
+  archives[archive.id] = archive;
+  await game.settings.set(state.context.moduleId, ARCHIVE_FALLBACK_SETTING, { archives });
 }
 
 function renderArchiveMessages(archive) {
