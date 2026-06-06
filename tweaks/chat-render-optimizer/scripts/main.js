@@ -5,13 +5,15 @@ const TARGET_RENDERED_MESSAGES = 70;
 const PRUNE_DEBOUNCE_MS = 80;
 const BOTTOM_DISTANCE = 80;
 const MESSAGE_SELECTOR = ".chat-message, [data-message-id]";
+const HISTORY_GATE_SELECTOR = ".vorfale-chat-history-gate";
 
 const state = {
   context: null,
   patched: false,
   originalRenderBatch: null,
   observers: new WeakMap(),
-  pruneTimers: new WeakMap()
+  pruneTimers: new WeakMap(),
+  hydratedLogs: new WeakSet()
 };
 
 export function init(tweakContext) {
@@ -53,6 +55,11 @@ function patchChatLogRenderBatch() {
     if (!state.context?.isEnabled?.()) return state.originalRenderBatch.call(this, size, ...args);
 
     const log = getChatLogElement(this);
+    if (shouldDeferHistory(log)) {
+      ensureHistoryGate(log, this);
+      return;
+    }
+
     const wasAtBottom = isAtBottom(log);
     const limit = getRenderedMessages(log).length ? SCROLL_BATCH_LIMIT : INITIAL_BATCH_LIMIT;
     const cappedSize = Math.min(Number(size) || limit, limit);
@@ -78,8 +85,50 @@ function scheduleAttach(chatLog) {
     state.observers.set(log, observer);
 
     prepareLogImages(log);
+    if (shouldDeferHistory(log)) ensureHistoryGate(log, chatLog);
     schedulePrune(chatLog, { preserveBottom: true });
   }, 0);
+}
+
+function shouldDeferHistory(log) {
+  if (!log) return false;
+  if (state.hydratedLogs.has(log)) return false;
+  return !getRenderedMessages(log).length || Boolean(log.querySelector(HISTORY_GATE_SELECTOR));
+}
+
+function ensureHistoryGate(log, chatLog) {
+  if (!log || log.querySelector(HISTORY_GATE_SELECTOR)) return;
+
+  const gate = document.createElement("div");
+  gate.className = "vorfale-chat-history-gate";
+  gate.innerHTML = `
+    <p>${escapeHTML(state.context.localize("HistoryDeferred"))}</p>
+    <button type="button" class="primary">
+      <i class="fa-solid fa-clock-rotate-left" inert></i>
+      ${escapeHTML(state.context.localize("LoadHistory"))}
+    </button>
+  `;
+
+  gate.querySelector("button")?.addEventListener("click", () => hydrateHistory(log, chatLog));
+  log.prepend(gate);
+}
+
+async function hydrateHistory(log, chatLog) {
+  if (!log || state.hydratedLogs.has(log)) return;
+
+  state.hydratedLogs.add(log);
+  log.querySelector(HISTORY_GATE_SELECTOR)?.remove();
+
+  if (typeof state.originalRenderBatch !== "function" || typeof chatLog?.renderBatch !== "function") return;
+
+  try {
+    await state.originalRenderBatch.call(chatLog, INITIAL_BATCH_LIMIT);
+    prepareLogImages(log);
+    schedulePrune(chatLog, { preserveBottom: true });
+    scrollToBottom(log);
+  } catch (error) {
+    console.debug("vorfale-tweaks/chat-render-optimizer | Could not hydrate chat history.", error);
+  }
 }
 
 function schedulePrune(chatLog, options = {}) {
@@ -175,4 +224,14 @@ function normalizeRenderedElement(html) {
   if (Array.isArray(html)) return html[0] ?? null;
   if (html?.jquery) return html[0] ?? null;
   return html?.[0] ?? null;
+}
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, character => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[character]));
 }

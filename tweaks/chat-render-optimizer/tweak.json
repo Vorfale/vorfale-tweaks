@@ -4,6 +4,9 @@
   "category": "Foundry V14 fixes",
   "order": 905,
   "esmodule": "scripts/main.js",
+  "styles": [
+    "styles/chat-render-optimizer.css"
+  ],
   "languages": [
     "languages/en.json",
     "languages/ru.json"

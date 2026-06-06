@@ -1,4 +1,6 @@
 {
   "VORFALE_TWEAKS.chat-render-optimizer.name": "Chat Render Optimizer",
-  "VORFALE_TWEAKS.chat-render-optimizer.hint": "Keeps the full chat history intact while rendering fewer chat cards at once to reduce startup and sidebar lag in large worlds."
+  "VORFALE_TWEAKS.chat-render-optimizer.hint": "Keeps the full chat history intact while rendering fewer chat cards at once to reduce startup and sidebar lag in large worlds.",
+  "VORFALE_TWEAKS.chat-render-optimizer.LoadHistory": "Show recent chat",
+  "VORFALE_TWEAKS.chat-render-optimizer.HistoryDeferred": "Older chat history is paused for faster loading. New messages still appear normally."
 }

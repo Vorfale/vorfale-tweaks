@@ -64,7 +64,7 @@ The module is intended for Foundry VTT v14.
 ### Foundry V14 Fixes
 
 - **Chat Render Optimizer**  
-  Keeps the full chat history intact while reducing how many chat cards are rendered in the sidebar at once. It follows the same general strategy used by large message lists: keep the data, virtualize the visible DOM, load older messages in smaller batches, and lazy-load chat images.
+  Keeps the full chat history intact while reducing how many chat cards are rendered in the sidebar at once. It defers old chat history on startup, shows new messages normally, adds a "Show recent chat" button for history hydration, loads older messages in smaller batches, and lazy-loads chat images.
 
 - **Levels**  
   Adds a "Hide tokens under floor" control to Level settings. Lower tokens can be hidden under opaque background pixels while still remaining visible through transparent areas using Foundry's normal visibility rules.
