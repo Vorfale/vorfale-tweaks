@@ -1,6 +1,21 @@
 {
-  "VORFALE_TWEAKS.chat-render-optimizer.name": "Оптимизация рендера чата",
-  "VORFALE_TWEAKS.chat-render-optimizer.hint": "Оставляет всю историю чата нетронутой, но одновременно отрисовывает меньше карточек, чтобы ускорить загрузку и уменьшить лаги большого чата.",
-  "VORFALE_TWEAKS.chat-render-optimizer.LoadHistory": "Показать последние сообщения",
-  "VORFALE_TWEAKS.chat-render-optimizer.HistoryDeferred": "Старая история чата временно не отрисовывается для ускорения загрузки. Новые сообщения появляются как обычно."
+  "VORFALE_TWEAKS.chat-render-optimizer.name": "Архив сессий чата",
+  "VORFALE_TWEAKS.chat-render-optimizer.hint": "Разделяет чат на активную сессию и файловые архивы, чтобы старую историю можно было убрать из живой загрузки ChatMessage без потери истории.",
+  "VORFALE_TWEAKS.chat-render-optimizer.ActiveChat": "Активный",
+  "VORFALE_TWEAKS.chat-render-optimizer.ArchiveChat": "Архив",
+  "VORFALE_TWEAKS.chat-render-optimizer.ArchiveOldChat": "Архивировать старый чат",
+  "VORFALE_TWEAKS.chat-render-optimizer.RefreshArchive": "Обновить",
+  "VORFALE_TWEAKS.chat-render-optimizer.ArchiveHint": "Архивы сохраняются JSON-файлами в этом мире. Активный чат уменьшается только после успешной записи архива.",
+  "VORFALE_TWEAKS.chat-render-optimizer.NoArchives": "Архивов чата пока нет.",
+  "VORFALE_TWEAKS.chat-render-optimizer.NothingToArchive": "Нет старых сообщений, готовых к архивированию.",
+  "VORFALE_TWEAKS.chat-render-optimizer.ArchivingStarted": "Архивирую старые сообщения чата...",
+  "VORFALE_TWEAKS.chat-render-optimizer.ArchivingDone": "Заархивировано сообщений: {count}.",
+  "VORFALE_TWEAKS.chat-render-optimizer.ArchivingFailed": "Не удалось заархивировать чат. Проверь консоль перед повторной попыткой.",
+  "VORFALE_TWEAKS.chat-render-optimizer.ConfirmArchiveTitle": "Архивировать старый чат?",
+  "VORFALE_TWEAKS.chat-render-optimizer.ConfirmArchiveContent": "Это сохранит {count} публичных сообщений старше {days} дней в архивный файл, оставит минимум {keep} последних живых публичных сообщений, а затем уберет заархивированные сообщения из активной загрузки чата.",
+  "VORFALE_TWEAKS.chat-render-optimizer.LoadingArchive": "Загружаю архив...",
+  "VORFALE_TWEAKS.chat-render-optimizer.ArchiveLoadFailed": "Не удалось загрузить этот архив.",
+  "VORFALE_TWEAKS.chat-render-optimizer.ArchiveMeta": "{count} сообщений, {first} - {last}",
+  "VORFALE_TWEAKS.chat-render-optimizer.ArchivePreviewLimited": "Показано {shown} из {total} архивных сообщений.",
+  "VORFALE_TWEAKS.chat-render-optimizer.UnknownSpeaker": "Неизвестно"
 }
