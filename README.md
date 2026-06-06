@@ -57,7 +57,7 @@ The module is intended for Foundry VTT v14.
   Opens a focused setup dialog after actor creation and from actor sheet actions. It edits actor portrait, prototype token image, token name, token display mode, and optional Image Hover specific art.
 
 - **Load Diagnostics**  
-  Adds a lightweight client load audit for slow-loading players. It records Foundry loading milestones, canvas readiness, resource timing, slow assets, module resource downloads, scene weight, captured client errors, and safe optimization recommendations. GMs can see summaries from players whose clients reached the ready/canvas-ready stage. It cannot measure work that happens before this module itself is loaded.
+  Adds a lightweight client load audit for slow-loading players. It records Foundry loading milestones, canvas readiness, resource timing, slow assets, module resource downloads, chat history weight, rendered chat size, scene weight, captured client errors, and safe optimization recommendations. GMs can see summaries from players whose clients reached the ready/canvas-ready stage. It cannot measure work that happens before this module itself is loaded.
 
 ### Foundry V14 Fixes
 

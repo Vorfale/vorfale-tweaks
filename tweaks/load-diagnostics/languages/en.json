@@ -11,6 +11,8 @@
   "VORFALE_TWEAKS.load-diagnostics.SectionMilestones": "Milestones",
   "VORFALE_TWEAKS.load-diagnostics.SectionSlowResources": "Slow resources",
   "VORFALE_TWEAKS.load-diagnostics.SectionModules": "Module resources",
+  "VORFALE_TWEAKS.load-diagnostics.SectionChat": "Chat load",
+  "VORFALE_TWEAKS.load-diagnostics.SectionHeavyChatMessages": "Largest chat messages",
   "VORFALE_TWEAKS.load-diagnostics.SectionScene": "Active scene",
   "VORFALE_TWEAKS.load-diagnostics.SectionPlayers": "Player reports",
   "VORFALE_TWEAKS.load-diagnostics.Tooltip": "Open a client load audit with slow assets, scene size, module resource timing, and player reports."

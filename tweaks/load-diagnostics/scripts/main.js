@@ -4,13 +4,19 @@ const HISTORY_KEY = "vorfaleTweaks.loadDiagnostics.history";
 const MAX_RESOURCES = 400;
 const MAX_ERRORS = 80;
 const MAX_HISTORY = 5;
+const MAX_CHAT_HEAVY_MESSAGES = 12;
 const SLOW_RESOURCE_MS = 2000;
 const LARGE_RESOURCE_BYTES = 5 * 1024 * 1024;
+const LARGE_CHAT_MESSAGES = 1500;
+const LARGE_CHAT_HTML_BYTES = 2 * 1024 * 1024;
+const CHAT_MEDIA_WARNING_COUNT = 100;
 
 let context;
 let run;
 let observer;
 let saveTimer = 0;
+let chatRenderStarted = 0;
+let chatCaptureTimer = 0;
 const remoteReports = new Map();
 
 export function init(tweakContext) {
@@ -38,6 +44,7 @@ function onReady() {
   captureEnvironment();
   capturePackageSnapshot();
   setupSocket();
+  captureChatSnapshot("ready");
   scheduleClientReport();
   schedulePersist();
 }
@@ -54,14 +61,21 @@ function captureMilestones() {
   ];
 
   for (const [hook, name] of onceHooks) {
-    Hooks.once(hook, () => {
+    Hooks.once(hook, (...args) => {
       mark(name);
+      if (hook === "renderChatLog") captureChatRender(args);
       if (hook === "canvasReady") {
         captureSceneSnapshot();
         scheduleClientReport();
       }
     });
   }
+}
+
+function captureChatRender(args) {
+  chatRenderStarted = performance.now();
+  const element = normalizeHookElement(args[1] ?? args[0]);
+  scheduleChatDomCapture(element);
 }
 
 function configurePerformanceBuffer() {
@@ -244,6 +258,116 @@ function capturePackageSnapshot() {
   };
 }
 
+function captureChatSnapshot(source = "manual") {
+  const messages = Array.from(game.messages?.values?.() ?? []);
+  const existing = run.chat ?? defaultChatSnapshot();
+  const heavyMessages = [];
+  const bySpeaker = new Map();
+  const byType = new Map();
+  let htmlBytes = 0;
+  let textBytes = 0;
+  let mediaMessages = 0;
+  let imageCount = 0;
+  let videoCount = 0;
+  let audioCount = 0;
+  let rollMessages = 0;
+  let whisperMessages = 0;
+  let firstTimestamp = null;
+  let lastTimestamp = null;
+
+  for (const message of messages) {
+    const content = String(message.content ?? "");
+    const text = stripHTML(content);
+    const contentBytes = byteLength(content);
+    const textOnlyBytes = byteLength(text);
+    const media = countMedia(content);
+    const speaker = message.speaker?.alias || message.alias || message.user?.name || "Unknown";
+    const type = message.type ?? message.style ?? "unknown";
+    const timestamp = Number(message.timestamp ?? message._source?.timestamp ?? 0) || null;
+
+    htmlBytes += contentBytes;
+    textBytes += textOnlyBytes;
+    imageCount += media.images;
+    videoCount += media.videos;
+    audioCount += media.audio;
+    if (media.total) mediaMessages += 1;
+    if (message.rolls?.length || content.includes("dice-roll")) rollMessages += 1;
+    if (message.whisper?.length) whisperMessages += 1;
+    if (timestamp) {
+      firstTimestamp = firstTimestamp === null ? timestamp : Math.min(firstTimestamp, timestamp);
+      lastTimestamp = lastTimestamp === null ? timestamp : Math.max(lastTimestamp, timestamp);
+    }
+
+    bySpeaker.set(speaker, (bySpeaker.get(speaker) ?? 0) + 1);
+    byType.set(String(type), (byType.get(String(type)) ?? 0) + 1);
+    heavyMessages.push({
+      id: message.id,
+      speaker,
+      timestamp,
+      htmlBytes: contentBytes,
+      textBytes: textOnlyBytes,
+      media: media.total,
+      preview: text.trim().slice(0, 140)
+    });
+  }
+
+  heavyMessages.sort((a, b) => b.htmlBytes - a.htmlBytes);
+  run.chat = {
+    ...existing,
+    source,
+    capturedAt: round(performance.now()),
+    messageCount: messages.length,
+    htmlBytes,
+    textBytes,
+    mediaMessages,
+    imageCount,
+    videoCount,
+    audioCount,
+    rollMessages,
+    whisperMessages,
+    firstTimestamp,
+    lastTimestamp,
+    byType: topMapEntries(byType, 12),
+    topSpeakers: topMapEntries(bySpeaker, 12),
+    heavyMessages: heavyMessages.slice(0, MAX_CHAT_HEAVY_MESSAGES)
+  };
+}
+
+function scheduleChatDomCapture(element) {
+  window.clearTimeout(chatCaptureTimer);
+  chatCaptureTimer = window.setTimeout(() => {
+    chatCaptureTimer = 0;
+    captureChatDomSnapshot(element);
+    captureChatSnapshot("renderChatLog");
+    scheduleClientReport();
+    schedulePersist();
+  }, 600);
+}
+
+function captureChatDomSnapshot(element) {
+  const root = element ?? document.querySelector("#chat-log");
+  const chatLog = root?.matches?.("#chat-log") ? root : root?.querySelector?.("#chat-log") ?? document.querySelector("#chat-log");
+  const messages = Array.from(chatLog?.querySelectorAll?.(".message") ?? []);
+  const htmlBytes = byteLength(chatLog?.innerHTML ?? "");
+  const media = countMedia(chatLog?.innerHTML ?? "");
+  const renderMs = chatRenderStarted ? round(performance.now() - chatRenderStarted) : null;
+
+  run.chat = {
+    ...(run.chat ?? defaultChatSnapshot()),
+    dom: {
+      capturedAt: round(performance.now()),
+      renderMs,
+      renderedMessages: messages.length,
+      htmlBytes,
+      images: media.images,
+      videos: media.videos,
+      audio: media.audio,
+      scrollHeight: chatLog?.scrollHeight ?? 0,
+      clientHeight: chatLog?.clientHeight ?? 0
+    }
+  };
+}
+
 function captureSceneSnapshot() {
   const scene = globalThis.canvas?.scene ?? game.scenes?.active ?? game.user?.viewedScene;
   if (!scene) return;
@@ -282,6 +406,8 @@ function openReportDialog() {
   captureEnvironment();
   capturePackageSnapshot();
   captureSceneSnapshot();
+  captureChatSnapshot("dialog");
+  captureChatDomSnapshot();
   collectBufferedResources();
   persistNow();
 
@@ -315,6 +441,7 @@ function openReportDialog() {
 
 function buildReport() {
   collectBufferedResources();
+  captureChatSnapshot("report");
   const resources = run.resources.slice().sort((a, b) => b.duration - a.duration);
   const moduleResources = summarizeModuleResources(resources);
   const report = {
@@ -344,6 +471,9 @@ function buildSummary(report) {
     resources: report.resources.length,
     slowResources: report.slowResources.length,
     largeResources: report.largeResources.length,
+    chatMessages: report.chat?.messageCount ?? 0,
+    chatHtmlBytes: report.chat?.htmlBytes ?? 0,
+    chatMedia: report.chat ? report.chat.imageCount + report.chat.videoCount + report.chat.audioCount : 0,
     errors: report.errors.length,
     scene: report.scene?.name ?? ""
   };
@@ -359,7 +489,8 @@ function buildRecommendations(resources, moduleResources) {
     connection: run.environment.connection,
     hardwareConcurrency: run.environment.hardwareConcurrency,
     deviceMemory: run.environment.deviceMemory,
-    errors: run.errors.length
+    errors: run.errors.length,
+    chat: run.chat
   };
 
   if (summary.slowResources.length) {
@@ -404,6 +535,23 @@ function buildRecommendations(resources, moduleResources) {
     recommendations.push(`Captured ${summary.errors} client errors/rejections. Check the errors section and browser console; a single failed module can keep the client on a black screen.`);
   }
 
+  if (summary.chat?.messageCount >= LARGE_CHAT_MESSAGES) {
+    recommendations.push(`Chat contains ${summary.chat.messageCount} messages. Export and clear chat history, then retest the slow player; large chat logs are a common world-load drag.`);
+  }
+
+  if (summary.chat?.htmlBytes >= LARGE_CHAT_HTML_BYTES) {
+    recommendations.push(`Chat HTML content is about ${formatBytes(summary.chat.htmlBytes)}. Large formatted chat messages, rolls, and embedded media can slow chat rendering and world load.`);
+  }
+
+  const chatMedia = summary.chat ? summary.chat.imageCount + summary.chat.videoCount + summary.chat.audioCount : 0;
+  if (chatMedia >= CHAT_MEDIA_WARNING_COUNT) {
+    recommendations.push(`Chat contains ${chatMedia} media embeds. Old chat images/video/audio can trigger extra network work while loading; consider exporting and clearing chat.`);
+  }
+
+  if (summary.chat?.dom?.renderMs && summary.chat.dom.renderMs > 1000) {
+    recommendations.push(`Chat DOM rendering took ${formatMs(summary.chat.dom.renderMs)} on this client. This points to chat history size, chat media, or a module that decorates chat messages.`);
+  }
+
   if (!recommendations.length) {
     recommendations.push("No obvious client-side bottleneck was captured. If the player still loads slowly, compare this report with their report and check server/VPN/network path.");
   }
@@ -423,6 +571,7 @@ function renderReport(report) {
           ${row("Runtime", formatMs(summary.totalRuntimeMs))}
           ${row("Active modules", summary.activeModules)}
           ${row("Resources", summary.resources)}
+          ${row("Chat messages", summary.chatMessages)}
           ${row("Errors", summary.errors)}
           ${row("Scene", escapeHTML(summary.scene || "-"))}
         </dl>
@@ -431,9 +580,35 @@ function renderReport(report) {
       ${section(context.localize("SectionMilestones"), table(["Stage", "Time"], report.marks.map(mark => [mark.label, formatMs(mark.at)])))}
       ${section(context.localize("SectionSlowResources"), table(["Resource", "Time", "Size"], report.slowResources.slice(0, 12).map(resource => [shortPath(resource.name), formatMs(resource.duration), formatBytes(resource.transferSize || resource.decodedBodySize)])))}
       ${section(context.localize("SectionModules"), table(["Module", "Time", "Files"], report.moduleResources.slice(0, 12).map(item => [item.module, formatMs(item.duration), item.count])))}
+      ${section(context.localize("SectionChat"), renderChat(report.chat))}
       ${section(context.localize("SectionScene"), renderScene(report.scene))}
       ${game.user?.isGM ? section(context.localize("SectionPlayers"), table(["Player", "Ready", "Canvas", "Slow"], report.playerReports.map(item => [item.user, formatMs(item.readyMs), formatMs(item.canvasReadyMs), item.slowResources]))) : ""}
     </div>
+  `;
+}
+
+function renderChat(chat) {
+  if (!chat) return `<p class="notes">${context.localize("NoData")}</p>`;
+  const mediaTotal = chat.imageCount + chat.videoCount + chat.audioCount;
+  return `
+    <dl class="vorfale-load-summary">
+      ${row("Messages", chat.messageCount)}
+      ${row("Approx HTML size", formatBytes(chat.htmlBytes))}
+      ${row("Approx text size", formatBytes(chat.textBytes))}
+      ${row("Roll messages", chat.rollMessages)}
+      ${row("Whisper messages", chat.whisperMessages)}
+      ${row("Media embeds", `${mediaTotal} (${chat.imageCount} images, ${chat.videoCount} video, ${chat.audioCount} audio)`)}
+      ${row("Rendered messages", chat.dom?.renderedMessages ?? "-")}
+      ${row("Chat render", formatMs(chat.dom?.renderMs))}
+      ${row("Rendered HTML size", formatBytes(chat.dom?.htmlBytes))}
+    </dl>
+    <h4>${escapeHTML(context.localize("SectionHeavyChatMessages"))}</h4>
+    ${table(["Speaker", "Size", "Media", "Preview"], (chat.heavyMessages ?? []).slice(0, 8).map(message => [
+      escapeHTML(message.speaker),
+      formatBytes(message.htmlBytes),
+      message.media,
+      escapeHTML(message.preview || "-")
+    ]))}
   `;
 }
 
@@ -493,6 +668,8 @@ async function copySummary(report) {
     `Canvas ready: ${formatMs(report.summary.canvasReadyMs)}`,
     `Resources: ${report.summary.resources}`,
     `Slow resources: ${report.summary.slowResources}`,
+    `Chat messages: ${report.summary.chatMessages}`,
+    `Chat size: ${formatBytes(report.summary.chatHtmlBytes)}`,
     `Errors: ${report.summary.errors}`,
     `Scene: ${report.summary.scene || "-"}`
   ];
@@ -581,7 +758,30 @@ function createRun() {
     errors: [],
     environment: {},
     packages: { activeModules: [], inactiveModuleCount: 0 },
-    scene: null
+    scene: null,
+    chat: defaultChatSnapshot()
+  };
+}
+
+function defaultChatSnapshot() {
+  return {
+    source: "",
+    capturedAt: null,
+    messageCount: 0,
+    htmlBytes: 0,
+    textBytes: 0,
+    mediaMessages: 0,
+    imageCount: 0,
+    videoCount: 0,
+    audioCount: 0,
+    rollMessages: 0,
+    whisperMessages: 0,
+    firstTimestamp: null,
+    lastTimestamp: null,
+    byType: [],
+    topSpeakers: [],
+    heavyMessages: [],
+    dom: null
   };
 }
 
@@ -628,6 +828,36 @@ function classifyResource(value) {
   return "other";
 }
 
+function countMedia(html) {
+  const text = String(html ?? "");
+  const images = (text.match(/<img\b/gi) ?? []).length;
+  const videos = (text.match(/<video\b/gi) ?? []).length;
+  const audio = (text.match(/<audio\b/gi) ?? []).length;
+  return {
+    images,
+    videos,
+    audio,
+    total: images + videos + audio
+  };
+}
+
+function stripHTML(html) {
+  const template = document.createElement("template");
+  template.innerHTML = String(html ?? "");
+  return template.content.textContent ?? "";
+}
+
+function byteLength(value) {
+  return new Blob([String(value ?? "")]).size;
+}
+
+function topMapEntries(map, limit) {
+  return Array.from(map.entries())
+    .map(([key, count]) => ({ key, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, limit);
+}
+
 function stripOrigin(value) {
   const url = safeUrl(value);
   if (!url) return String(value ?? "");
@@ -667,6 +897,13 @@ function round(value) {
 
 function safeFileName(value) {
   return String(value ?? "user").replace(/[^a-z0-9_-]+/gi, "-").replace(/^-+|-+$/g, "") || "user";
+}
+
+function normalizeHookElement(html) {
+  if (html instanceof HTMLElement) return html;
+  if (Array.isArray(html)) return html[0] ?? null;
+  if (html?.jquery) return html[0] ?? null;
+  return html?.[0] ?? null;
 }
 
 function escapeHTML(value) {
