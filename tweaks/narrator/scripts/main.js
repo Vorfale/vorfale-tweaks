@@ -5,6 +5,33 @@ const STATE_SETTING = "narratorState";
 const BOX_VISIBLE_HEIGHT = 290;
 const BOX_MAX_HEIGHT = 310;
 const DEFAULT_DURATION_MULTIPLIER = 1;
+const ALLOWED_FORMAT_TAGS = new Set([
+  "B",
+  "BLOCKQUOTE",
+  "BR",
+  "CODE",
+  "DIV",
+  "EM",
+  "H1",
+  "H2",
+  "H3",
+  "H4",
+  "H5",
+  "H6",
+  "HR",
+  "I",
+  "LI",
+  "OL",
+  "P",
+  "S",
+  "SMALL",
+  "STRONG",
+  "SUB",
+  "SUP",
+  "U",
+  "UL"
+]);
+const DROPPED_FORMAT_TAGS = new Set(["IFRAME", "OBJECT", "SCRIPT", "STYLE", "TEMPLATE"]);
 
 let context;
 let currentNarrationId = 0;
@@ -107,12 +134,12 @@ async function createNarratorMessage(type, rawMessage) {
   }
 
   const message = normalizeCommandMessage(rawMessage);
-  if (!message) {
+  if (!message.text) {
     ui.notifications.warn(context.localize("EmptyMessage"));
     return;
   }
 
-  const content = renderNarratorMessage(message);
+  const content = renderNarratorMessage(message.html);
   const chatData = {
     user: game.user.id,
     content,
@@ -131,7 +158,7 @@ async function createNarratorMessage(type, rawMessage) {
     id: getNarratorState().narration.id + 1,
     display: true,
     message: content,
-    plainText: message,
+    plainText: message.text,
     paused: false
   });
 
@@ -308,14 +335,61 @@ function messageDuration(length) {
   return (Math.max(2000, Math.min(length * 80, 20000)) + 3000) * DEFAULT_DURATION_MULTIPLIER + 500;
 }
 
-function renderNarratorMessage(message) {
-  return `<div class="vorfale-narrator-message">${escapeHTML(message).replace(/\n/g, "<br>")}</div>`;
+function renderNarratorMessage(html) {
+  return `<div class="vorfale-narrator-message">${html}</div>`;
 }
 
 function normalizeCommandMessage(value) {
+  const html = sanitizeBasicFormatting(value);
+  return {
+    html,
+    text: getPlainText(html).trim()
+  };
+}
+
+function sanitizeBasicFormatting(value) {
   const template = document.createElement("template");
-  template.innerHTML = String(value ?? "").replace(/<br\b[^>]*>/gi, "\n");
-  return (template.content.textContent ?? String(value ?? "")).trim();
+  const raw = String(value ?? "").trim();
+
+  if (!raw.includes("<")) {
+    return escapeHTML(raw)
+      .split(/\n{2,}/)
+      .map(paragraph => paragraph.trim().replace(/\n/g, "<br>"))
+      .filter(Boolean)
+      .map(paragraph => `<p>${paragraph}</p>`)
+      .join("");
+  }
+
+  template.innerHTML = raw;
+  sanitizeNodeList(template.content.childNodes);
+  return template.content.textContent?.trim() ? template.innerHTML.trim() : "";
+}
+
+function sanitizeNodeList(nodes) {
+  for (const node of Array.from(nodes)) sanitizeNode(node);
+}
+
+function sanitizeNode(node) {
+  if (node.nodeType === Node.TEXT_NODE) return;
+  if (node.nodeType !== Node.ELEMENT_NODE) {
+    node.remove();
+    return;
+  }
+
+  const tag = node.tagName.toUpperCase();
+  if (DROPPED_FORMAT_TAGS.has(tag)) {
+    node.remove();
+    return;
+  }
+
+  sanitizeNodeList(node.childNodes);
+
+  if (!ALLOWED_FORMAT_TAGS.has(tag)) {
+    node.replaceWith(...Array.from(node.childNodes));
+    return;
+  }
+
+  for (const attribute of Array.from(node.attributes)) node.removeAttribute(attribute.name);
 }
 
 function getPlainText(html) {

@@ -47,6 +47,29 @@
   white-space: pre-line;
 }
 
+.vorfale-narrator-message p,
+.vorfale-narrator-message blockquote,
+.vorfale-narrator-message ul,
+.vorfale-narrator-message ol {
+  margin: 0.35em 0;
+}
+
+.vorfale-narrator-message h1,
+.vorfale-narrator-message h2,
+.vorfale-narrator-message h3,
+.vorfale-narrator-message h4,
+.vorfale-narrator-message h5,
+.vorfale-narrator-message h6 {
+  margin: 0.35em 0 0.2em;
+}
+
+.vorfale-narrator-message ul,
+.vorfale-narrator-message ol {
+  display: inline-block;
+  padding-left: 1.5em;
+  text-align: left;
+}
+
 .narrator {
   align-items: center;
   display: flex;
