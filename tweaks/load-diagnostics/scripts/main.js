@@ -5,6 +5,8 @@ const MAX_RESOURCES = 400;
 const MAX_ERRORS = 80;
 const MAX_HISTORY = 5;
 const MAX_CHAT_HEAVY_MESSAGES = 12;
+const AUTO_PERSIST_DELAY_MS = 8000;
+const MIN_PERSIST_INTERVAL_MS = 15000;
 const SLOW_RESOURCE_MS = 2000;
 const LARGE_RESOURCE_BYTES = 5 * 1024 * 1024;
 const LARGE_CHAT_MESSAGES = 1500;
@@ -15,8 +17,10 @@ let context;
 let run;
 let observer;
 let saveTimer = 0;
+let lastPersistAt = 0;
 let chatRenderStarted = 0;
 let chatCaptureTimer = 0;
+const resourceKeys = new Set();
 const remoteReports = new Map();
 
 export function init(tweakContext) {
@@ -44,7 +48,6 @@ function onReady() {
   captureEnvironment();
   capturePackageSnapshot();
   setupSocket();
-  captureChatSnapshot("ready");
   scheduleClientReport();
   schedulePersist();
 }
@@ -165,8 +168,9 @@ function recordResource(entry) {
   if (!entry?.name) return;
 
   const resource = normalizeResource(entry);
-  const existing = run.resources.find(item => item.name === resource.name && item.startTime === resource.startTime);
-  if (existing) return;
+  const key = `${resource.name}|${resource.startTime}`;
+  if (resourceKeys.has(key)) return;
+  resourceKeys.add(key);
 
   run.resources.push(resource);
   if (run.resources.length > MAX_RESOURCES) {
@@ -337,10 +341,12 @@ function scheduleChatDomCapture(element) {
   window.clearTimeout(chatCaptureTimer);
   chatCaptureTimer = window.setTimeout(() => {
     chatCaptureTimer = 0;
-    captureChatDomSnapshot(element);
-    captureChatSnapshot("renderChatLog");
-    scheduleClientReport();
-    schedulePersist();
+    runWhenIdle(() => {
+      captureChatDomSnapshot(element);
+      captureChatSnapshot("renderChatLog");
+      scheduleClientReport();
+      schedulePersist();
+    });
   }, 600);
 }
 
@@ -439,9 +445,9 @@ function openReportDialog() {
   }).render(true);
 }
 
-function buildReport() {
+function buildReport({ refreshChat = false } = {}) {
   collectBufferedResources();
-  captureChatSnapshot("report");
+  if (refreshChat) captureChatSnapshot("report");
   const resources = run.resources.slice().sort((a, b) => b.duration - a.duration);
   const moduleResources = summarizeModuleResources(resources);
   const report = {
@@ -716,6 +722,10 @@ function summarizeRemoteReport(report) {
 }
 
 function persistNow() {
+  const now = performance.now();
+  if (now - lastPersistAt < MIN_PERSIST_INTERVAL_MS) return;
+  lastPersistAt = now;
+
   try {
     const report = buildReport();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(report));
@@ -738,7 +748,7 @@ function schedulePersist() {
   saveTimer = window.setTimeout(() => {
     saveTimer = 0;
     if (context?.isEnabled?.()) persistNow();
-  }, 1000);
+  }, AUTO_PERSIST_DELAY_MS);
 }
 
 function createRun() {
@@ -856,6 +866,15 @@ function topMapEntries(map, limit) {
     .map(([key, count]) => ({ key, count }))
     .sort((a, b) => b.count - a.count)
     .slice(0, limit);
+}
+
+function runWhenIdle(callback) {
+  if (typeof window.requestIdleCallback === "function") {
+    window.requestIdleCallback(callback, { timeout: 2500 });
+    return;
+  }
+
+  window.setTimeout(callback, 1200);
 }
 
 function stripOrigin(value) {
