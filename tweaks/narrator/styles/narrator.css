@@ -1,75 +1,122 @@
-.vorfale-narrator-chat {
-  border: 0;
-  box-shadow: none;
+.chat-log .message.narrator-chat,
+#chat-log .message.narrator-chat {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: white;
+  font-weight: 100;
+  text-align: center;
 }
 
-.vorfale-narrator-chat .message-header,
-.vorfale-narrator-chat .message-metadata,
-.vorfale-narrator-chat .message-sender {
+.chat-log .message.narrator-narrative,
+#chat-log .message.narrator-narrative {
+  background: #333;
+  font-style: italic;
+}
+
+.chat-log .message.narrator-description,
+#chat-log .message.narrator-description {
+  background: #4b4a44;
+  font-style: italic;
+}
+
+.chat-log .message.narrator-chat .message-header,
+.chat-log .message.narrator-chat .message-header.flexrow,
+#chat-log .message.narrator-chat .message-header,
+#chat-log .message.narrator-chat .message-header.flexrow {
   display: none;
 }
 
-.vorfale-narrator-chat .message-content {
-  padding: 0.7rem 0.9rem;
+.chat-log .message.narrator-chat .message-content,
+#chat-log .message.narrator-chat .message-content {
+  padding: 0.55rem 0.75rem;
+}
+
+.chat-log .message.narrator-chat a.content-link,
+#chat-log .message.narrator-chat a.content-link {
+  color: black;
+  font-weight: 400;
+}
+
+.narrator-chat a.entity-link,
+.narrator-chat a.inline-roll {
+  background: none;
+  border: 1px solid #707098;
 }
 
 .vorfale-narrator-message {
-  color: var(--color-text-primary, #f2f0ea);
-  font-family: Georgia, "Times New Roman", serif;
-  line-height: 1.55;
   margin: 0;
-  text-align: center;
-  white-space: normal;
+  white-space: pre-line;
 }
 
-.vorfale-narrator-message p {
-  margin: 0.35rem 0;
-}
-
-.vorfale-narrator-description .vorfale-narrator-message {
-  font-size: 1.03rem;
-  font-style: italic;
-  letter-spacing: 0;
-}
-
-.vorfale-narrator-narration .vorfale-narrator-message {
-  font-size: 1.08rem;
-  font-weight: 600;
-}
-
-.vorfale-narrator-overlay {
+.narrator {
   align-items: center;
-  background:
-    radial-gradient(ellipse at center, rgba(12, 10, 8, 0.18), rgba(4, 4, 6, 0.82)),
-    linear-gradient(180deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.68));
-  bottom: 0;
-  color: #f7f1df;
+  display: flex;
+  height: 100%;
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+  z-index: 1;
+}
+
+.narrator-buttons {
   display: flex;
   justify-content: center;
+  position: absolute;
+  transition: 0.5s ease-in-out;
+  visibility: hidden;
+  width: 100%;
+}
+
+.narrator-buttons button {
+  cursor: pointer;
+  margin: 0 5px;
+  pointer-events: all;
+  width: 100px;
+}
+
+.narrator-frame {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  left: 0;
+  transition: 0.1s ease-in-out;
+  width: 100%;
+}
+
+.narrator-frameBG {
+  background: rgba(0, 0, 0, 0.2);
+  height: 100%;
   left: 0;
   opacity: 0;
-  pointer-events: none;
-  position: fixed;
-  right: 0;
+  transition: 0.5s ease-in-out;
+  width: 100%;
+}
+
+.narrator-bg {
+  position: absolute;
+  transition: 0.5s ease-in-out;
+  width: 100%;
+}
+
+.narrator-box {
+  max-height: 310px;
+  max-width: 800px;
+  overflow-y: hidden;
+  position: absolute;
+  width: 50%;
+}
+
+.narrator-content {
+  color: white;
+  font-size: 28px;
+  font-weight: bold;
+  left: 0;
+  opacity: 0;
+  position: relative;
   text-align: center;
+  text-shadow: 3px 3px 2px black;
   top: 0;
-  transition: opacity 350ms ease;
-  z-index: 100000;
-}
-
-.vorfale-narrator-overlay.vorfale-narrator-overlay-visible {
-  opacity: 1;
-}
-
-.vorfale-narrator-overlay-content {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(2rem, 4.2vw, 5rem);
-  line-height: 1.22;
-  max-width: min(1100px, 86vw);
-  padding: 2rem;
-  text-shadow: 0 3px 24px rgba(0, 0, 0, 0.95), 0 0 18px rgba(255, 216, 135, 0.18);
-}
-
-.vorfale-narrator-overlay-content p {
-  margin: 0.45em 0;
+  transition: opacity 0.5s ease-in-out;
+  white-space: pre-line;
+  z-index: 1;
 }
