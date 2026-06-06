@@ -1,6 +1,5 @@
 const ARCHIVE_INDEX_SETTING = "chatArchiveIndex";
 const ARCHIVE_DIR = "vorfale-chat-archives";
-const ARCHIVE_OLDER_THAN_DAYS = 30;
 const MIN_ACTIVE_MESSAGES = 500;
 const ARCHIVE_BATCH_LIMIT = 2000;
 const MAX_ARCHIVE_PREVIEW_MESSAGES = 250;
@@ -44,6 +43,7 @@ function scheduleEnhanceChat(chatLog) {
     if (!root || !log) return;
 
     ensureTabs(root, log);
+    ensureActiveArchiveControl(root, log);
     renderArchivePanel(root);
     applyMode(root, log, state.activeMode);
   }, 0);
@@ -64,14 +64,37 @@ function ensureTabs(root, log) {
     if (!button) return;
 
     state.activeMode = button.dataset.vorfaleChatMode;
-    applyMode(root, log, state.activeMode);
+    const currentRoot = getChatRoot(ui.chat) ?? root;
+    const currentLog = getChatLogElement(ui.chat) ?? log;
+    renderArchivePanel(currentRoot);
+    applyMode(currentRoot, currentLog, state.activeMode);
   });
 
   const reference = log.previousElementSibling ?? log;
   reference.parentElement?.insertBefore(tabs, reference);
 }
 
+function ensureActiveArchiveControl(root, log) {
+  if (!game.user?.isGM) return;
+  if (root.querySelector(".vorfale-chat-active-archive-control")) return;
+
+  const control = document.createElement("div");
+  control.className = "vorfale-chat-active-archive-control";
+  control.innerHTML = `
+    <button type="button" class="primary" data-vorfale-action="archive-old-chat">
+      <i class="fa-solid fa-box-archive" inert></i>
+      ${escapeHTML(localize("ArchiveOldChat"))}
+    </button>
+    <p>${escapeHTML(localize("ActiveArchiveHint"))}</p>
+  `;
+
+  control.querySelector("[data-vorfale-action='archive-old-chat']")?.addEventListener("click", archiveOldChat);
+  log.parentElement?.insertBefore(control, log);
+}
+
 function renderArchivePanel(root) {
+  if (!root) return;
+
   let panel = root.querySelector(".vorfale-chat-archive-panel");
   if (!panel) {
     panel = document.createElement("section");
@@ -119,10 +142,12 @@ function renderArchivePanel(root) {
 function applyMode(root, log, mode) {
   const archivePanel = root.querySelector(".vorfale-chat-archive-panel");
   const tabs = root.querySelector(".vorfale-chat-tabs");
+  const activeControl = root.querySelector(".vorfale-chat-active-archive-control");
 
   root.classList.toggle("vorfale-chat-archive-mode", mode === "archive");
-  log.hidden = mode === "archive";
-  if (archivePanel) archivePanel.hidden = mode !== "archive";
+  log?.classList.toggle("vorfale-chat-pane-hidden", mode === "archive");
+  archivePanel?.classList.toggle("vorfale-chat-pane-hidden", mode !== "archive");
+  activeControl?.classList.toggle("vorfale-chat-pane-hidden", mode === "archive");
 
   for (const button of tabs?.querySelectorAll("[data-vorfale-chat-mode]") ?? []) {
     button.classList.toggle("active", button.dataset.vorfaleChatMode === mode);
@@ -135,9 +160,10 @@ function restoreChatMode() {
   if (!root || !log) return;
 
   root.querySelector(".vorfale-chat-tabs")?.remove();
+  root.querySelector(".vorfale-chat-active-archive-control")?.remove();
   root.querySelector(".vorfale-chat-archive-panel")?.remove();
   root.classList.remove("vorfale-chat-archive-mode");
-  log.hidden = false;
+  log.classList.remove("vorfale-chat-pane-hidden");
 }
 
 async function archiveOldChat() {
@@ -158,7 +184,9 @@ async function archiveOldChat() {
     await appendArchiveIndex(archive);
     await ChatMessage.deleteDocuments(candidates.map(message => message.id));
     state.archiveCache.set(archive.id, archive);
-    renderArchivePanel(getChatRoot(ui.chat));
+    const root = getChatRoot(ui.chat);
+    renderArchivePanel(root);
+    if (root) applyMode(root, getChatLogElement(ui.chat), "archive");
     ui.notifications?.info?.(game.i18n.format("VORFALE_TWEAKS.chat-render-optimizer.ArchivingDone", { count: candidates.length }));
   } catch (error) {
     console.error("vorfale-tweaks/chat-render-optimizer | Could not archive chat messages.", error);
@@ -173,11 +201,8 @@ function getArchiveCandidates() {
     .sort((a, b) => getMessageTimestamp(a) - getMessageTimestamp(b));
 
   const activeFloor = Math.max(0, messages.length - MIN_ACTIVE_MESSAGES);
-  const cutoff = Date.now() - (ARCHIVE_OLDER_THAN_DAYS * 24 * 60 * 60 * 1000);
-
   return messages
     .slice(0, activeFloor)
-    .filter(message => getMessageTimestamp(message) < cutoff)
     .slice(0, ARCHIVE_BATCH_LIMIT);
 }
 
@@ -191,7 +216,6 @@ async function confirmArchive(count) {
     title: localize("ConfirmArchiveTitle"),
     content: `<p>${game.i18n.format("VORFALE_TWEAKS.chat-render-optimizer.ConfirmArchiveContent", {
       count,
-      days: ARCHIVE_OLDER_THAN_DAYS,
       keep: MIN_ACTIVE_MESSAGES
     })}</p>`,
     yes: () => true,
@@ -380,7 +404,7 @@ function getMessageTimestamp(message) {
 }
 
 function getChatRoot(chatLog = ui.chat) {
-  return chatLog?.element ?? document.querySelector("#chat");
+  return normalizeElement(chatLog?.element) ?? document.querySelector("#chat");
 }
 
 function getChatLogElement(chatLog = ui.chat) {
@@ -404,6 +428,13 @@ function localize(key) {
 
 function escapeAttribute(value) {
   return escapeHTML(value).replace(/`/g, "&#96;");
+}
+
+function normalizeElement(element) {
+  if (element instanceof HTMLElement) return element;
+  if (Array.isArray(element)) return element[0] ?? null;
+  if (element?.jquery) return element[0] ?? null;
+  return element?.[0] ?? null;
 }
 
 function escapeHTML(value) {

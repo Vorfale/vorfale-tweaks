@@ -15,16 +15,33 @@
   box-shadow: inset 0 -2px 0 var(--color-border-highlight, #ff6400);
 }
 
+.vorfale-chat-active-archive-control {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0 0.5rem 0.4rem;
+  padding: 0.5rem;
+  border: 1px solid var(--color-border-light-tertiary, rgb(255 255 255 / 16%));
+  border-radius: 6px;
+  background: rgb(0 0 0 / 16%);
+}
+
+.vorfale-chat-active-archive-control p {
+  margin: 0;
+  color: var(--color-text-light-6, #a8a8a8);
+  font-size: var(--font-size-12);
+  line-height: 1.35;
+}
+
+.vorfale-chat-pane-hidden {
+  display: none !important;
+}
+
 .vorfale-chat-archive-panel {
   display: grid;
   gap: 0.5rem;
   overflow-y: auto;
   min-height: 0;
   padding: 0 0.5rem 0.5rem;
-}
-
-.vorfale-chat-archive-panel[hidden] {
-  display: none;
 }
 
 .vorfale-chat-archive-toolbar {

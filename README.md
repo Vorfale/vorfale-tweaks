@@ -64,7 +64,7 @@ The module is intended for Foundry VTT v14.
 ### Foundry V14 Fixes
 
 - **Chat Session Archive**  
-  Splits chat into Active and Archive tabs. GMs can save old chat messages to JSON files in the world folder and then remove those archived messages from live `ChatMessage` loading, keeping the active chat lighter without losing history.
+  Splits chat into Active and Archive tabs. GMs can save old public chat messages to JSON files in the world folder and then remove those archived messages from live `ChatMessage` loading, keeping the active chat lighter without losing history. The current test build keeps the latest 500 public messages active and archives older public messages in batches.
 
 - **Levels**  
   Adds a "Hide tokens under floor" control to Level settings. Lower tokens can be hidden under opaque background pixels while still remaining visible through transparent areas using Foundry's normal visibility rules.
