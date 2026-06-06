@@ -29,8 +29,6 @@
   "VORFALE_TWEAKS.plain-chat-input.hint": "Отключает автоматическое markdown-форматирование в поле ввода чата.",
   "VORFALE_TWEAKS.narrator.name": "Нарратор",
   "VORFALE_TWEAKS.narrator.hint": "Добавляет чат-команды /narrate и /describe для кинематографичного повествования.",
-  "VORFALE_TWEAKS.chat-render-optimizer.name": "Архив сессий чата",
-  "VORFALE_TWEAKS.chat-render-optimizer.hint": "Разделяет чат на активную сессию и файловые архивы, чтобы старую историю можно было убрать из живой загрузки ChatMessage без потери истории.",
   "VORFALE_TWEAKS.load-diagnostics.name": "Диагностика загрузки",
   "VORFALE_TWEAKS.load-diagnostics.hint": "Собирает этапы загрузки клиента, медленные ресурсы, тайминги ресурсов модулей, вес чата, вес сцены, ошибки и безопасные рекомендации по оптимизации."
 }

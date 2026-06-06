@@ -29,8 +29,6 @@
   "VORFALE_TWEAKS.plain-chat-input.hint": "Disables automatic markdown-style formatting shortcuts in the chat input.",
   "VORFALE_TWEAKS.narrator.name": "Narrator",
   "VORFALE_TWEAKS.narrator.hint": "Adds /narrate and /describe chat commands for cinematic narration.",
-  "VORFALE_TWEAKS.chat-render-optimizer.name": "Chat Session Archive",
-  "VORFALE_TWEAKS.chat-render-optimizer.hint": "Splits chat into an active session and file-backed archives so old chat can be removed from live ChatMessage loading without losing history.",
   "VORFALE_TWEAKS.load-diagnostics.name": "Load Diagnostics",
   "VORFALE_TWEAKS.load-diagnostics.hint": "Collects client loading milestones, slow resources, module resource timings, scene weight, errors, and safe optimization recommendations."
 }
