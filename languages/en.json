@@ -6,7 +6,7 @@
   "VORFALE_TWEAKS.DependencyModule": "module",
   "VORFALE_TWEAKS.MissingDependencies": "Missing: {dependencies}.",
   "VORFALE_TWEAKS.sr-portraits.name": "SR Portraits",
-  "VORFALE_TWEAKS.sr-portraits.hint": "Shows the speaking token portrait in chat, refreshes changed images, and falls back to player/GM avatars when needed.",
+  "VORFALE_TWEAKS.sr-portraits.hint": "Shows the speaking token portrait in chat, handles wildcard token images safely, refreshes changed images, and falls back to player/GM avatars when needed.",
   "VORFALE_TWEAKS.chat-images.name": "Chat Images",
   "VORFALE_TWEAKS.chat-images.hint": "Adds chat media posting, uploads, paste support, and media previews.",
   "VORFALE_TWEAKS.levels.name": "Levels",

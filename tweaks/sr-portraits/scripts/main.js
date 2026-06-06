@@ -2,15 +2,25 @@ const PORTRAIT_SIZE = 40;
 
 let context;
 let refreshTimer = 0;
+const brokenImages = new Set();
 
 export function init(tweakContext) {
   context = tweakContext;
 
   Hooks.on("renderChatMessageHTML", (message, html) => addPortraitToMessage(message, html));
   Hooks.on("renderChatMessage", (message, html) => addPortraitToMessage(message, html));
-  Hooks.on("updateActor", scheduleVisiblePortraitRefresh);
-  Hooks.on("updateToken", scheduleVisiblePortraitRefresh);
-  Hooks.on("updateUser", scheduleVisiblePortraitRefresh);
+  Hooks.on("updateActor", (_actor, changes) => {
+    clearBrokenImagesForImageChange(changes, ["img", "prototypeToken"]);
+    scheduleVisiblePortraitRefresh();
+  });
+  Hooks.on("updateToken", (_token, changes) => {
+    clearBrokenImagesForImageChange(changes, ["texture", "img"]);
+    scheduleVisiblePortraitRefresh();
+  });
+  Hooks.on("updateUser", (_user, changes) => {
+    clearBrokenImagesForImageChange(changes, ["avatar", "img", "image", "texture"]);
+    scheduleVisiblePortraitRefresh();
+  });
 
   context.onChange(enabled => {
     if (!enabled) removeExistingPortraits();
@@ -105,21 +115,38 @@ function getSpeakerActor(message) {
 }
 
 function getSpeakerImage(message, actor, user = getMessageUser(message), excluded = new Set()) {
-  const tokenImage = cleanImage(getSpeakerTokenImage(message), excluded);
-  const prototypeImage = cleanImage(actor?.prototypeToken?.texture?.src, excluded);
+  const tokenDocument = getSpeakerTokenDocument(message);
+  const tokenImage = cleanImage(getTokenDocumentImage(tokenDocument), excluded);
+  const prototypeImage = cleanImage(getPrototypeTokenImage(actor), excluded);
   const actorImage = cleanImage(actor?.img, excluded);
   const userImage = cleanImage(getUserImage(user), excluded);
   const userCharacterImage = cleanImage(user?.character?.img, excluded);
   return tokenImage ?? prototypeImage ?? actorImage ?? userImage ?? userCharacterImage ?? null;
 }
 
-function getSpeakerTokenImage(message) {
+function getSpeakerTokenDocument(message) {
   const speaker = message.speaker ?? message.data?.speaker;
   if (!speaker?.token) return null;
 
   const scene = speaker.scene ? game.scenes?.get(speaker.scene) : canvas?.scene;
-  const tokenDocument = scene?.tokens?.get(speaker.token);
-  return tokenDocument?.texture?.src ?? tokenDocument?.actor?.img ?? null;
+  return scene?.tokens?.get(speaker.token) ?? null;
+}
+
+function getTokenDocumentImage(tokenDocument) {
+  if (!tokenDocument) return null;
+
+  const src = tokenDocument.texture?.src;
+  if (isWildcardToken(tokenDocument) && isWildcardPath(src)) return null;
+  return src ?? tokenDocument.actor?.img ?? null;
+}
+
+function getPrototypeTokenImage(actor) {
+  const prototypeToken = actor?.prototypeToken;
+  if (!prototypeToken) return null;
+
+  const src = prototypeToken.texture?.src;
+  if (isWildcardToken(prototypeToken) || isWildcardPath(src)) return null;
+  return src;
 }
 
 function getMessageUser(message) {
@@ -141,7 +168,31 @@ function getUserImage(user) {
 function cleanImage(src, excluded = new Set()) {
   if (!src || src === "icons/svg/mystery-man.svg") return null;
   if (excluded.has(src)) return null;
+  if (brokenImages.has(src)) return null;
+  if (isWildcardPath(src)) return null;
   return src;
+}
+
+function isWildcardToken(tokenDocument) {
+  return Boolean(
+    tokenDocument?.randomImg
+    ?? tokenDocument?._source?.randomImg
+  );
+}
+
+function isWildcardPath(src) {
+  return typeof src === "string" && (src.includes("*") || /\{[^}]+}/.test(src));
+}
+
+function clearBrokenImagesForImageChange(changes, keys) {
+  if (!changes || !keys.some(key => hasPropertyPath(changes, key))) return;
+  brokenImages.clear();
+}
+
+function hasPropertyPath(object, path) {
+  if (Object.keys(object).some(key => key === path || key.startsWith(`${path}.`))) return true;
+  if (globalThis.foundry?.utils?.hasProperty) return foundry.utils.hasProperty(object, path);
+  return path.split(".").reduce((value, key) => value?.[key], object) !== undefined;
 }
 
 function openPortraitActor(event, portraitLink) {
@@ -163,6 +214,8 @@ function fromUuidSyncSafe(uuid) {
 
 function handlePortraitImageError(message, element, portrait) {
   const broken = portrait.dataset.currentSrc || portrait.getAttribute("src");
+  if (broken) brokenImages.add(broken);
+
   const actor = getSpeakerActor(message);
   const user = getMessageUser(message);
   const replacement = getSpeakerImage(message, actor, user, new Set([broken]));
